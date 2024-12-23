@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+// @ts-expect-error type-only import
 import type { Server } from '@callstack/repack-dev-server';
 import { type Configuration, rspack } from '@rspack/core';
 import type {
@@ -8,12 +9,17 @@ import type {
   WatchOptions,
 } from '@rspack/core';
 import memfs from 'memfs';
-import type { Reporter } from '../../logging';
-import type { HMRMessageBody } from '../../types';
-import { adaptFilenameToPlatform, getEnvOptions, loadConfig } from '../common';
-import { DEV_SERVER_ASSET_TYPES } from '../consts';
-import type { StartCliOptions } from '../types';
-import type { CompilerAsset, MultiWatching } from './types';
+import type { Reporter } from '../../logging/types.js';
+import type { HMRMessageBody } from '../../types.js';
+import {
+  adaptFilenameToPlatform,
+  getEnvOptions,
+  loadConfig,
+  runAdbReverse,
+} from '../common/index.js';
+import { DEV_SERVER_ASSET_TYPES } from '../consts.js';
+import type { StartCliOptions } from '../types.js';
+import type { CompilerAsset, MultiWatching } from './types.js';
 
 export class Compiler {
   platforms: string[];
@@ -73,6 +79,12 @@ export class Compiler {
     this.compiler.hooks.watchRun.tap('repack:watch', () => {
       this.isCompilationInProgress = true;
       this.platforms.forEach((platform) => {
+        if (platform === 'android') {
+          void runAdbReverse({
+            port: this.cliOptions.arguments.start.port!,
+            logger: this.devServerContext.log,
+          });
+        }
         this.devServerContext.notifyBuildStart(platform);
       });
     });

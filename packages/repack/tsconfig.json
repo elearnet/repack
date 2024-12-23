@@ -1,16 +1,6 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020", "ES2021"],
-    "declaration": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
     "rootDirs": ["src", "../dev-server/src"],
     "paths": {
       "@callstack/repack-dev-server": ["../dev-server/src/index.ts"],
@@ -20,10 +10,5 @@
       ]
     }
   },
-  "include": [
-    "./client.d.ts",
-    "./commands.d.ts",
-    "src/**/*",
-    "../dev-server/src"
-  ]
+  "include": ["src/**/*"]
 }

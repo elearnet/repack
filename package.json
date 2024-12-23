@@ -1,6 +1,5 @@
 {
   "name": "repack",
-  "packageManager": "yarn@3.6.4",
   "private": true,
   "scripts": {
     "prepare": "is-in-ci || husky",
@@ -16,11 +15,6 @@
     "website:start": "pnpm --filter website run start",
     "website:build": "pnpm --filter website run export"
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*",
-    "tests/*"
-  ],
   "devDependencies": {
     "@babel/cli": "^7.25.2",
     "@babel/core": "^7.25.2",
@@ -35,6 +29,7 @@
     "husky": "^9.1.6",
     "is-in-ci": "^1.0.0",
     "nx": "19.7.3",
-    "typescript": "^5.5.3"
-  }
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.5.0"
 }

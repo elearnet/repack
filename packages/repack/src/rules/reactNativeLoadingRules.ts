@@ -1,6 +1,6 @@
 import type { RuleSetRule } from '@rspack/core';
-import { getModulePaths } from '../utils';
-import { REACT_NATIVE_LAZY_IMPORTS } from './lazyImports';
+import { getModulePaths } from '../utils/getModulePaths.js';
+import { REACT_NATIVE_LAZY_IMPORTS } from './lazyImports.js';
 
 /**
  * @constant REACT_NATIVE_LOADING_RULES
@@ -26,13 +26,21 @@ export const REACT_NATIVE_LOADING_RULES: RuleSetRule = {
           targets: { 'react-native': '0.74' },
         },
         jsc: {
+          // helpers alter the order of execution and cause weird issues with reanimated
+          // this is very likely an SWC issue
+          // TODO - investigate and reenable helpers in the future
+          externalHelpers: false,
+          loose: true,
           parser: {
             syntax: 'ecmascript',
             jsx: true,
             exportDefaultFrom: true,
           },
-          loose: true,
-          externalHelpers: true,
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
         },
         module: {
           type: 'commonjs',

@@ -30,6 +30,7 @@ export const startCommandOptions = [
   // noop, but kept for compatibility
   {
     name: '--reset-cache, --resetCache',
+    description: '(unsupported) Resets the transformation cache',
   },
   // options specific to Re.Pack
   {
@@ -51,8 +52,9 @@ export const startCommandOptions = [
       'Run the dev server for the specified platform only. By default, the dev server will bundle for all platforms.',
   },
   {
-    name: '--reverse-port',
-    description: 'ADB reverse port on starting devServers only for Android',
+    name: '--no-reverse-port',
+    description:
+      'Disables running ADB reverse automatically when bundling for Android',
   },
   {
     name: '--verbose',
@@ -114,6 +116,7 @@ export const bundleCommandOptions = [
   // noop, but kept for compatibility
   {
     name: '--reset-cache',
+    description: '(unsupported) Resets the transformation cache',
   },
   // options specific to Re.Pack
   {

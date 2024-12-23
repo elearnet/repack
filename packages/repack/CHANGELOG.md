@@ -1,5 +1,64 @@
 # @callstack/repack
 
+## 5.0.0-rc.4
+
+### Major Changes
+
+- [#825](https://github.com/callstack/repack/pull/825) [`18f2eef`](https://github.com/callstack/repack/commit/18f2eef7dbb2a79e709c1810c69a34b0a0fe9004) Thanks [@jbroma](https://github.com/jbroma)! - Removed `--reverse-port` CLI option and replaced it with `--no-reverse-port` CLI option.
+
+### Minor Changes
+
+- [#828](https://github.com/callstack/repack/pull/828) [`b1a010a`](https://github.com/callstack/repack/commit/b1a010a7dd8af5612759e134249ae0587e42aef7) Thanks [@jbroma](https://github.com/jbroma)! - Run adb reverse for all available devices by default
+
+- [#828](https://github.com/callstack/repack/pull/828) [`b1a010a`](https://github.com/callstack/repack/commit/b1a010a7dd8af5612759e134249ae0587e42aef7) Thanks [@jbroma](https://github.com/jbroma)! - Wait for android device before running adb reverse when starting dev-server
+
+- [#824](https://github.com/callstack/repack/pull/824) [`8cf7cc3`](https://github.com/callstack/repack/commit/8cf7cc3622ad85cf093005c5c55c8dd63940a57b) Thanks [@jbroma](https://github.com/jbroma)! - Added `adb reverse` interaction & `adb reverse` command is now run by default when bundling for Android
+
+### Patch Changes
+
+- [#829](https://github.com/callstack/repack/pull/829) [`617c501`](https://github.com/callstack/repack/commit/617c5018e1f2b0520f6f978b2c1440239196f662) Thanks [@jbroma](https://github.com/jbroma)! - Fix early JS errors not being displayed in LogBox
+
+- Updated dependencies []:
+  - @callstack/repack-dev-server@5.0.0-rc.4
+
+## 5.0.0-rc.3
+
+### Minor Changes
+
+- [#817](https://github.com/callstack/repack/pull/817) [`c97da24`](https://github.com/callstack/repack/commit/c97da241876ec8dbe6c2d206590d697f429e86b4) Thanks [@jbroma](https://github.com/jbroma)! - Add Repack Reanimated Plugin which integrates react-native-reanimated into the project
+
+- [#810](https://github.com/callstack/repack/pull/810) [`46330d7`](https://github.com/callstack/repack/commit/46330d70db99a372046baf8ee4565e4a21e5b4f3) Thanks [@jbroma](https://github.com/jbroma)! - Include `@rspack/plugin-react-refresh` with Re.Pack instead of requiring user to install it
+
+- [#816](https://github.com/callstack/repack/pull/816) [`6ed9a6f`](https://github.com/callstack/repack/commit/6ed9a6fcb40ba946b39dfe1d302ad2ebf9dffacf) Thanks [@jbroma](https://github.com/jbroma)! - Support platform specific assets
+
+- [#803](https://github.com/callstack/repack/pull/803) [`daffbf7`](https://github.com/callstack/repack/commit/daffbf72088ba666d956e35a265546a89ee84f42) Thanks [@jbroma](https://github.com/jbroma)! - Refactor FederationRuntimePlugin into two separate plugins for more granular control over the MF2 runtime behaviour (CorePlugin & ResolverPlugin)
+
+### Patch Changes
+
+- [#821](https://github.com/callstack/repack/pull/821) [`287991e`](https://github.com/callstack/repack/commit/287991eb002725f78c23aafe89131fcadb8edaf1) Thanks [@jbroma](https://github.com/jbroma)! - Ignore irrelevant MF2 runtime warning about request of a dependency being an expression
+
+- [#814](https://github.com/callstack/repack/pull/814) [`592fbe3`](https://github.com/callstack/repack/commit/592fbe3fe8eeeeb856d260c3106f5f6cd6eeaef8) Thanks [@jbroma](https://github.com/jbroma)! - Fix how size of a scaled assets is obtained (aligned with metro)
+
+- [#808](https://github.com/callstack/repack/pull/808) [`f600e07`](https://github.com/callstack/repack/commit/f600e075645c5f310abe67591cbdf11221944cba) Thanks [@jbroma](https://github.com/jbroma)! - Fix type JSX runtime transform when transpiling node modules
+
+- [#819](https://github.com/callstack/repack/pull/819) [`9890400`](https://github.com/callstack/repack/commit/9890400fe5ac750698ceb3eaf72e0b3a86ae4a73) Thanks [@jbroma](https://github.com/jbroma)! - Fix missing sourcemap generation for codegen related files and configure separate rules for ts & tsx files
+
+- [#802](https://github.com/callstack/repack/pull/802) [`502527e`](https://github.com/callstack/repack/commit/502527e8c44990fb544ff500034dbdbd687c5d60) Thanks [@thymikee](https://github.com/thymikee)! - Export commands from package entrypoint
+
+- [#820](https://github.com/callstack/repack/pull/820) [`39f80b3`](https://github.com/callstack/repack/commit/39f80b3661a348b9d778f76af2848ed615582d23) Thanks [@jbroma](https://github.com/jbroma)! - Ignore setUpTests warning from Reanimated by default
+
+- Updated dependencies []:
+  - @callstack/repack-dev-server@5.0.0-rc.3
+
+## 5.0.0-rc.2
+
+### Patch Changes
+
+- [#799](https://github.com/callstack/repack/pull/799) [`f801083`](https://github.com/callstack/repack/commit/f801083f7ba616e77fa77c1c6321875de6886388) Thanks [@jbroma](https://github.com/jbroma)! - Expose MF2 config property to external tooling
+
+- Updated dependencies []:
+  - @callstack/repack-dev-server@5.0.0-rc.2
+
 ## 5.0.0-rc.1
 
 ### Major Changes

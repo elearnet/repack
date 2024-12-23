@@ -1,8 +1,8 @@
 import NativeScriptManager, {
   type NormalizedScriptLocator,
-} from '../NativeScriptManager';
-import { Script } from '../Script';
-import { ScriptManager } from '../ScriptManager';
+} from '../NativeScriptManager.js';
+import { Script } from '../Script.js';
+import { ScriptManager } from '../ScriptManager.js';
 
 jest.mock('../NativeScriptManager', () => ({
   loadScript: jest.fn(),
@@ -20,6 +20,7 @@ jest.mock('../NativeScriptManager', () => ({
 }));
 
 globalThis.__webpack_require__ = {
+  i: [],
   u: (id: string) => `${id}.chunk.bundle`,
   p: () => '',
   repack: {
