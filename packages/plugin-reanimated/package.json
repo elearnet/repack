@@ -9,7 +9,10 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "loader"],
+  "files": [
+    "dist",
+    "loader"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -36,7 +39,6 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@babel/core": "^7.20",
     "@callstack/repack": "^5.0.0-rc.4"
