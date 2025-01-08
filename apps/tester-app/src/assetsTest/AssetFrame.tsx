@@ -1,8 +1,9 @@
+import React from 'react';
 import {
   Image,
-  type ImageSourcePropType,
-  type ImageStyle,
-  type StyleProp,
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
   StyleSheet,
   Text,
   View,

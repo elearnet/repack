@@ -1,7 +1,7 @@
-import { URL } from 'node:url';
+import { URL } from 'url';
 import { codeFrameColumns } from '@babel/code-frame';
-import type { FastifyLoggerInstance } from 'fastify';
 import { SourceMapConsumer } from 'source-map';
+import type { FastifyLoggerInstance } from 'fastify';
 import type {
   CodeFrame,
   InputStackFrame,
@@ -9,7 +9,7 @@ import type {
   StackFrame,
   SymbolicatorDelegate,
   SymbolicatorResults,
-} from './types.js';
+} from './types';
 
 /**
  * Class for transforming stack traces from React Native application with using Source Map.
@@ -29,18 +29,19 @@ export class Symbolicator {
   static inferPlatformFromStack(stack: ReactNativeStackFrame[]) {
     for (const frame of stack) {
       if (!frame.file) {
-        continue;
+        return;
       }
 
       const { searchParams, pathname } = new URL(frame.file, 'file://');
       const platform = searchParams.get('platform');
       if (platform) {
         return platform;
-      }
-      const [bundleFilename] = pathname.split('/').reverse();
-      const [, platformOrExtension, extension] = bundleFilename.split('.');
-      if (extension) {
-        return platformOrExtension;
+      } else {
+        const [bundleFilename] = pathname.split('/').reverse();
+        const [, platformOrExtension, extension] = bundleFilename.split('.');
+        if (extension) {
+          return platformOrExtension;
+        }
       }
     }
   }
@@ -78,7 +79,7 @@ export class Symbolicator {
     const frames: InputStackFrame[] = [];
     for (const frame of stack) {
       const { file } = frame;
-      if (file?.startsWith('http')) {
+      if (file?.startsWith('http') && !file.includes('debuggerWorker')) {
         frames.push(frame as InputStackFrame);
       }
     }
@@ -165,7 +166,6 @@ export class Symbolicator {
     const lookup = consumer.originalPositionFor({
       line: frame.lineNumber,
       column: frame.column,
-      bias: SourceMapConsumer.LEAST_UPPER_BOUND,
     });
 
     // If lookup fails, we get the same shape object, but with

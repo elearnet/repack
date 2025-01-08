@@ -1,6 +1,98 @@
-import type { StatsCompilation } from '@rspack/core';
+import webpack from 'webpack';
 
 export type Rule = string | RegExp;
+
+export interface Fallback<T> {
+  fallback: T | (() => T);
+}
+
+/**
+ * Represent interface of Webpack logger.
+ * See: https://webpack.js.org/api/logging/
+ */
+export type WebpackLogger = ReturnType<
+  webpack.Compiler['getInfrastructureLogger']
+>;
+
+/**
+ * Interface that all Webpack plugins should implement.
+ */
+export interface WebpackPlugin {
+  /**
+   * Entry point for a plugin. It should perform any kind of setup or initialization
+   * hook into compiler's events.
+   *
+   * @param compiler Webpack compiler instance.
+   */
+  apply(compiler: webpack.Compiler): void;
+}
+
+/**
+ * CLI arguments passed from React Native CLI when running bundle command.
+ *
+ * @internal
+ */
+export interface BundleArguments {
+  entryFile: string;
+  platform: string;
+  dev: boolean;
+  minify?: boolean;
+  bundleOutput?: string;
+  sourcemapOutput?: string;
+  assetsDest?: string;
+  json?: string;
+  stats?: string;
+  verbose?: boolean;
+  watch?: boolean;
+  webpackConfig?: string;
+}
+
+/**
+ * CLI arguments passed from React Native CLI when running start command.
+ *
+ * @internal
+ */
+export interface StartArguments {
+  port?: number;
+  host: string;
+  https?: boolean;
+  key?: string;
+  cert?: string;
+  interactive?: boolean;
+  experimentalDebugger?: boolean;
+  json?: boolean;
+  logFile?: string;
+  reversePort?: boolean;
+  silent?: boolean;
+  verbose?: boolean;
+  webpackConfig?: string;
+}
+
+/**
+ * Holds all information used by {@link parseCliOptions}.
+ *
+ * @internal
+ */
+export interface CliOptions {
+  config: {
+    root: string;
+    reactNativePath: string;
+    webpackConfigPath: string;
+  };
+  command: 'bundle' | 'start';
+  arguments:
+    | {
+        bundle: BundleArguments;
+      }
+    | {
+        start: StartArguments;
+      };
+}
+
+export interface WebpackWorkerOptions {
+  cliOptions: CliOptions;
+  platform: string;
+}
 
 /**
  * Development server configuration options.
@@ -42,7 +134,7 @@ export interface DevServerOptions {
  *
  * This is the return type of {@link parseCliOptions}.
  */
-export interface EnvOptions {
+export interface WebpackEnvOptions {
   /** Compilation mode. */
   mode?: 'production' | 'development';
 
@@ -81,22 +173,26 @@ export interface EnvOptions {
   devServer?: DevServerOptions;
 }
 
+/**
+ * Represent Hot Module Replacement Update body.
+ *
+ * @internal
+ */
 export interface HMRMessageBody {
   name: string;
   time: number;
   hash: string;
-  warnings: StatsCompilation['warnings'];
-  errors: StatsCompilation['errors'];
+  warnings: webpack.StatsCompilation['warnings'];
+  errors: webpack.StatsCompilation['errors'];
+  modules: Record<string, string>;
 }
 
+/**
+ * Represent Hot Module Replacement Update message.
+ *
+ * @internal
+ */
 export interface HMRMessage {
   action: 'building' | 'built' | 'sync';
   body: HMRMessageBody | null;
-}
-
-export interface Logger {
-  debug: (...message: string[]) => void;
-  info: (...message: string[]) => void;
-  warn: (...message: string[]) => void;
-  error: (...message: string[]) => void;
 }

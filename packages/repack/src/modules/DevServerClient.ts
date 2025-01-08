@@ -1,5 +1,8 @@
+/* eslint-env browser */
+/* global __DEV__ */
+
 import prettyFormat from 'pretty-format';
-import { getDevServerLocation } from './getDevServerLocation.js';
+import { getDevServerLocation } from './getDevServerLocation';
 
 /**
  * With Webpack we don't use built-in metro-specific HMR client,
@@ -85,11 +88,12 @@ class DevServerClient {
 
 const client = new DevServerClient();
 
-export function setup() {}
-export function enable() {}
-export function disable() {}
-export function registerBundle() {}
-export function log(level: string, data: any[]) {
-  client.log(level, data);
-}
-export function unstable_notifyFuseboxConsoleEnabled() {}
+module.exports = {
+  setup() {},
+  enable() {},
+  disable() {},
+  registerBundle() {},
+  log(level: string, data: any[]) {
+    client.log(level, data);
+  },
+};

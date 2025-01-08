@@ -1,1 +1,1 @@
-export { default } from './apiPlugin.js';
+export { default } from './apiPlugin';

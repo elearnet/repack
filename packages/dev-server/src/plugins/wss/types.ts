@@ -1,5 +1,5 @@
-import type { IncomingMessage } from 'node:http';
-import type { Socket } from 'node:net';
+import { IncomingMessage } from 'node:http';
+import { Socket } from 'node:net';
 
 /**
  * Delegate with implementation for HMR-specific functions.

@@ -1,9 +1,8 @@
-import * as path from 'node:path';
-import { pluginCallstackTheme } from '@callstack/rspress-theme/plugin';
-import { pluginOpenGraph } from 'rsbuild-plugin-open-graph';
+import * as path from 'path';
+import { defineConfig } from 'rspress/config';
 import { pluginFontOpenSans } from 'rspress-plugin-font-open-sans';
 import vercelAnalytics from 'rspress-plugin-vercel-analytics';
-import { defineConfig } from 'rspress/config';
+import { pluginOpenGraph } from 'rsbuild-plugin-open-graph';
 
 export default defineConfig({
   root: path.join(__dirname, 'src'),
@@ -16,13 +15,12 @@ export default defineConfig({
   },
   outDir: 'build',
   markdown: {
-    // TODO fix dead links
-    checkDeadLinks: false,
+    checkDeadLinks: true,
     codeHighlighter: 'prism',
   },
   multiVersion: {
     default: '4.x',
-    versions: ['2.x', '3.x', '4.x', '5.x'],
+    versions: ['2.x', '3.x', '4.x'],
   },
   route: {
     cleanUrls: true,
@@ -55,6 +53,7 @@ export default defineConfig({
       },
     ],
   },
+  globalStyles: path.join(__dirname, 'src/styles/index.css'),
   builderConfig: {
     plugins: [
       pluginOpenGraph({
@@ -71,7 +70,7 @@ export default defineConfig({
       }),
     ],
     tools: {
-      rspack(_config, { addRules }) {
+      rspack(config, { addRules }) {
         addRules([
           {
             resourceQuery: /raw/,
@@ -81,12 +80,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [
-    // @ts-ignore
-    pluginFontOpenSans(),
-    // @ts-ignore
-    vercelAnalytics(),
-    // @ts-ignore
-    pluginCallstackTheme(),
-  ],
+  plugins: [pluginFontOpenSans(), vercelAnalytics()],
 });

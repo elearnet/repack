@@ -5,13 +5,7 @@ export interface Reporter {
 }
 
 /** Log message type. */
-export type LogType =
-  | 'debug'
-  | 'info'
-  | 'warn'
-  | 'error'
-  | 'success'
-  | 'progress';
+export type LogType = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Represent log message with all necessary data.

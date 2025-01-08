@@ -1,6 +1,7 @@
-import type { LogEntry, LogType } from './types.js';
+import type { LogEntry, LogType } from './types';
 
 export function makeLogEntryFromFastifyLog(data: any): LogEntry {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { level, time, pid, hostname, ...rest } = data;
 
   const levelToTypeMapping: Record<number, LogType> = {

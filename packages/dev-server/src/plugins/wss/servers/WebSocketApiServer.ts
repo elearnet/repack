@@ -1,6 +1,6 @@
-import type { FastifyInstance } from 'fastify';
-import type WebSocket from 'ws';
-import { WebSocketServer } from '../WebSocketServer.js';
+import { FastifyInstance } from 'fastify';
+import WebSocket from 'ws';
+import { WebSocketServer } from '../WebSocketServer';
 
 /**
  * Class for creating a WebSocket server for API clients.
@@ -48,11 +48,11 @@ export class WebSocketApiServer extends WebSocketServer {
     const clientId = `client#${this.nextClientId++}`;
     this.clients.set(clientId, socket);
 
-    this.fastify.log.debug({ msg: 'API client connected', clientId });
+    this.fastify.log.info({ msg: 'API client connected', clientId });
     this.clients.set(clientId, socket);
 
     const onClose = () => {
-      this.fastify.log.debug({
+      this.fastify.log.info({
         msg: 'API client disconnected',
         clientId,
       });

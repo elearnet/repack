@@ -1,4 +1,6 @@
-import type { WebpackContext } from './types.js';
+/* globals __webpack_require__ */
+
+import type { WebpackContext } from './types';
 
 /**
  * Get Webpack runtime context form current JavaScript scope.

@@ -21,11 +21,11 @@ module.exports = {
   plugins: ['@babel/plugin-transform-export-namespace-from'],
   overrides: [
     {
-      include: ['./src/**/implementation'],
+      include: ['./src/**/runtime/implementation'],
       comments: false,
     },
     {
-      exclude: ['./src/**/implementation', './src/modules'],
+      exclude: ['./src/**/runtime/implementation', './src/modules'],
       ...defaultConfig,
     },
   ],

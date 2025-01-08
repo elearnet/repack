@@ -1,13 +1,11 @@
-import { ScriptManager } from './ScriptManager.js';
-import type { WebpackContext } from './types.js';
+import { ScriptManager } from './ScriptManager';
+import type { WebpackContext } from './types';
 
 /**
  * Namespace for runtime utilities for Module Federation.
  */
 export namespace Federated {
   /**
-   * @deprecated
-   *
    * Resolves URL to a container or a chunk when using Module Federation,
    * based on given `scriptId` and `caller`.
    */
@@ -17,8 +15,6 @@ export namespace Federated {
   ) => string | ((webpackContext: WebpackContext) => string) | undefined;
 
   /**
-   * @deprecated
-   *
    * Configuration options for {@link createURLResolver} for Module Federation.
    * Allows to configure how created {@link URLResolver} will behave.
    */
@@ -103,8 +99,6 @@ export namespace Federated {
   }
 
   /**
-   * @deprecated
-   *
    * Creates URL resolver for Module Federation from provided config.
    *
    * @example
@@ -181,12 +175,10 @@ export namespace Federated {
    * ```
    *
    * @param config Configuration for the resolver.
-   * @param containerExt Extension of container bundles. Defaults to `.container.bundle`.
    * @returns A resolver function which will try to resolve URL based on given `scriptId` and `caller`.
    */
   export function createURLResolver(
-    config: Federated.URLResolverConfig,
-    containerExt = '.container.bundle'
+    config: Federated.URLResolverConfig
   ): Federated.URLResolver {
     const resolvers: Record<string, Federated.URLResolver> = {};
 
@@ -195,7 +187,7 @@ export namespace Federated {
         if (scriptId === key) {
           const url = config.containers[key]
             .replace(/\[name\]/g, scriptId)
-            .replace(/\[ext\]/g, containerExt);
+            .replace(/\[ext\]/g, '.container.bundle');
           return url;
         }
 
@@ -226,12 +218,10 @@ export namespace Federated {
   }
 
   declare function __webpack_init_sharing__(scope: string): Promise<void>;
-  declare let __webpack_share_scopes__: Record<string, any>;
-  declare let self: Record<string, any>;
+  declare var __webpack_share_scopes__: Record<string, any>;
+  declare var self: Record<string, any>;
 
   /**
-   * @deprecated
-   *
    * Dynamically imports module from a Module Federation container. Similar to `import('file')`, but
    * specific to Module Federation. Calling `importModule` will create an async boundary.
    *
@@ -262,7 +252,7 @@ export namespace Federated {
   export async function importModule<Exports = any>(
     containerName: string,
     module: string,
-    scope = 'default'
+    scope: string = 'default'
   ): Promise<Exports> {
     if (!__webpack_share_scopes__[scope]?.__isInitialized) {
       // Initializes the share scope.

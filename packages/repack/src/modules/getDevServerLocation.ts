@@ -1,21 +1,33 @@
-let hostname = __PUBLIC_HOST__;
+// @ts-ignore
+import getDevServer from 'react-native/Libraries/Core/Devtools/getDevServer';
 
-if (__PLATFORM__ === 'android' && __PUBLIC_HOST__ === 'localhost') {
-  hostname = '10.0.2.2';
+export interface DevServerLocation {
+  host: string;
+  hostname: string;
+  href: string;
+  origin: string;
+  pathname: string;
+  port?: string;
+  protocol?: string;
 }
 
-const location = {
-  host: `${hostname}:${__PUBLIC_PORT__}`,
-  hostname,
-  href: `${__PUBLIC_PROTOCOL__}://${hostname}:${__PUBLIC_PORT__}/`,
-  origin: `${__PUBLIC_PROTOCOL__}://${hostname}:${__PUBLIC_PORT__}`,
-  pathname: '/',
-  port: __PUBLIC_PORT__,
-  protocol: __PUBLIC_PROTOCOL__,
-};
-
-type DevServerLocation = typeof location;
+let location: DevServerLocation | undefined;
 
 export function getDevServerLocation(): DevServerLocation {
+  if (!location) {
+    const { url } = getDevServer() as { url: string };
+    const origin = url.replace(/\/$/, '');
+    const host = origin.replace(/https?:\/\//, '');
+    location = {
+      host,
+      hostname: host.split(':')[0],
+      href: url,
+      origin,
+      pathname: url.split(host)[1],
+      port: host.split(':')[1],
+      protocol: (url.match(/^([a-z])+:\/\//) || [undefined, undefined])[1],
+    };
+  }
+
   return location;
 }

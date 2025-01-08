@@ -1,16 +1,22 @@
-import { Writable } from 'node:stream';
-import middie from '@fastify/middie';
-import fastifySensible from '@fastify/sensible';
-import { createDevMiddleware } from '@react-native/dev-middleware';
+import { Writable } from 'stream';
 import Fastify from 'fastify';
-import apiPlugin from './plugins/api/apiPlugin.js';
-import compilerPlugin from './plugins/compiler/compilerPlugin.js';
-import devtoolsPlugin from './plugins/devtools/devtoolsPlugin.js';
-import faviconPlugin from './plugins/favicon/faviconPlugin.js';
-import multipartPlugin from './plugins/multipart/multipartPlugin.js';
-import symbolicatePlugin from './plugins/symbolicate/sybmolicatePlugin.js';
-import wssPlugin from './plugins/wss/wssPlugin.js';
-import { Internal, type Server } from './types.js';
+import fastifySensible from '@fastify/sensible';
+import middie from '@fastify/middie';
+// eslint-disable-next-line import/no-unresolved -- no main field in package.json
+import { createDevMiddleware } from '@react-native/dev-middleware';
+import { debuggerUIMiddleware } from '@react-native-community/cli-debugger-ui';
+import {
+  openURLMiddleware,
+  openStackFrameInEditorMiddleware,
+} from '@react-native-community/cli-server-api';
+import multipartPlugin from './plugins/multipart';
+import compilerPlugin from './plugins/compiler';
+import apiPlugin from './plugins/api';
+import wssPlugin from './plugins/wss';
+import faviconPlugin from './plugins/favicon';
+import { Internal, Server } from './types';
+import symbolicatePlugin from './plugins/symbolicate';
+import devtoolsPlugin from './plugins/devtools';
 
 /**
  * Create instance of development server, powered by Fastify.
@@ -19,12 +25,10 @@ import { Internal, type Server } from './types.js';
  * @returns `start` and `stop` functions as well as an underlying Fastify `instance`.
  */
 export async function createServer(config: Server.Config) {
-  // biome-ignore lint/style/useConst: needed in fastify constructor
   let delegate: Server.Delegate;
 
   /** Fastify instance powering the development server. */
   const instance = Fastify({
-    disableRequestLogging: !config.options.logRequests,
     logger: {
       level: 'trace',
       stream: new Writable({
@@ -39,7 +43,7 @@ export async function createServer(config: Server.Config) {
     ...(config.options.https ? { https: config.options.https } : undefined),
   });
 
-  delegate = await config.delegate({
+  delegate = config.delegate({
     log: instance.log,
     notifyBuildStart: (platform) => {
       instance.wss.apiServer.send({
@@ -66,8 +70,7 @@ export async function createServer(config: Server.Config) {
     serverBaseUrl: `http://${config.options.host}:${config.options.port}`,
     logger: instance.log,
     unstable_experiments: {
-      // @ts-expect-error removed in 0.76, keep this for backkwards compatibility
-      enableNewDebugger: true,
+      enableNewDebugger: config.experiments?.experimentalDebugger,
     },
   });
 
@@ -89,9 +92,18 @@ export async function createServer(config: Server.Config) {
   await instance.register(compilerPlugin, {
     delegate,
   });
+
+  // TODO: devtoolsPlugin and the following deprecated remote debugger middlewares should be removed after
+  //  the new (experimental) debugger is stable AND the remote debugger is finally removed from the React Native core.
+  //  When that happens remember to remove @react-native-community/cli-server-api & @react-native-community/cli-debugger-ui
+  //  from the dependencies.
   await instance.register(devtoolsPlugin, {
     options: config.options,
   });
+  instance.use('/debugger-ui', debuggerUIMiddleware());
+  instance.use('/open-url', openURLMiddleware);
+  instance.use('/open-stack-frame', openStackFrameInEditorMiddleware);
+
   await instance.register(symbolicatePlugin, {
     delegate,
   });

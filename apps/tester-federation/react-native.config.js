@@ -9,5 +9,5 @@ module.exports = {
       sourceDir: 'ios',
     },
   }),
-  commands: require('@callstack/repack/commands/rspack'),
+  commands: require('@callstack/repack/commands'),
 };

@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 import xcode from 'xcode';
 
 import logger from '../utils/logger.js';
@@ -63,7 +63,7 @@ function modifyBundleReactNativeShellScript(
 }
 
 function modifyPbxprojConfig(pbxprojPath: string) {
-  const project = xcode.project(pbxprojPath);
+  let project = xcode.project(pbxprojPath);
   project.parseSync();
 
   const bundleReactNativePhase = getBundleReactNativePhase(project);

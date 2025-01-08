@@ -1,11 +1,11 @@
-import util from 'node:util';
-import * as colorette from 'colorette';
-import throttle from 'throttleit';
-import type { LogEntry, LogType, Reporter } from '../types.js';
+import util from 'util';
+import colorette from 'colorette';
+import throttle from 'lodash.throttle';
+import type { LogEntry, LogType, Reporter } from '../types';
 
 export interface ConsoleReporterConfig {
   asJson?: boolean;
-  isVerbose?: boolean;
+  level?: 'silent' | 'normal' | 'verbose';
   isWorker?: boolean;
 }
 
@@ -53,21 +53,19 @@ const IS_SYMBOL_SUPPORTED =
   process.env.CI ||
   process.env.TERM === 'xterm-256color';
 
-const SYMBOLS: Record<LogType, string> = {
+const SYMBOLS: Record<LogType | 'progress', string> = {
   debug: colorette.gray('?'),
   info: colorette.blue('ℹ'),
   warn: colorette.yellow('⚠'),
   error: colorette.red('✖'),
-  success: colorette.green('✔'),
   progress: colorette.green('⇢'),
 };
 
-const FALLBACK_SYMBOLS: Record<LogType, string> = {
+const FALLBACK_SYMBOLS: Record<LogType | 'progress', string> = {
   debug: colorette.gray('?'),
   info: colorette.blue('i'),
   warn: colorette.yellow('!'),
   error: colorette.red('x'),
-  success: colorette.green('✓'),
   progress: colorette.green('->'),
 };
 
@@ -77,8 +75,13 @@ class InteractiveConsoleReporter implements Reporter {
   constructor(private config: ConsoleReporterConfig) {}
 
   process(log: LogEntry) {
+    // Do not log anything in silent mode
+    if (this.config.level === 'silent') {
+      return;
+    }
+
     // Do not log debug messages in non-verbose mode
-    if (log.type === 'debug' && !this.config.isVerbose) {
+    if (log.type === 'debug' && this.config.level !== 'verbose') {
       return;
     }
 
@@ -97,6 +100,34 @@ class InteractiveConsoleReporter implements Reporter {
       );
     }
   }
+
+  private processProgress = throttle((log: LogEntry) => {
+    const {
+      progress: { value, label, message, platform },
+    } = log.message[0] as {
+      progress: {
+        value: number;
+        label: string;
+        message: string;
+        platform: string;
+      };
+    };
+
+    const percentage = Math.floor(value * 100);
+
+    process.stdout.write(
+      `${
+        IS_SYMBOL_SUPPORTED ? SYMBOLS.progress : FALLBACK_SYMBOLS.progress
+      } ${this.prettifyLog({
+        timestamp: log.timestamp,
+        issuer: log.issuer,
+        type: 'info',
+        message: [`Compiling ${platform}: ${percentage}% ${label}`].concat(
+          ...(message ? [`(${message})`] : [])
+        ),
+      })}\n`
+    );
+  }, 2000);
 
   private normalizeLog(log: LogEntry): LogEntry | undefined {
     const message = [];
@@ -174,34 +205,6 @@ class InteractiveConsoleReporter implements Reporter {
     };
   }
 
-  private processProgress = throttle((log: LogEntry) => {
-    const {
-      progress: { value, label, message, platform },
-    } = log.message[0] as {
-      progress: {
-        value: number;
-        label: string;
-        message: string;
-        platform: string;
-      };
-    };
-
-    const percentage = Math.floor(value * 100);
-
-    process.stdout.write(
-      `${
-        IS_SYMBOL_SUPPORTED ? SYMBOLS.progress : FALLBACK_SYMBOLS.progress
-      } ${this.prettifyLog({
-        timestamp: log.timestamp,
-        issuer: log.issuer,
-        type: 'info',
-        message: [`Compiling ${platform}: ${percentage}% ${label}`].concat(
-          ...(message ? [`(${message})`] : [])
-        ),
-      })}\n`
-    );
-  }, 1000);
-
   private prettifyLog(log: LogEntry) {
     let body = '';
 
@@ -219,7 +222,7 @@ class InteractiveConsoleReporter implements Reporter {
         const { request } = value as {
           request: { method: string; statusCode: number; url: string };
         };
-        const statusText = `${request.method} ${request.statusCode}`;
+        let statusText = `${request.method} ${request.statusCode}`;
 
         let status = colorette.green(statusText);
         if (request.statusCode >= 500) {
@@ -270,8 +273,7 @@ class InteractiveConsoleReporter implements Reporter {
 function colorizeText(logType: LogType, text: string) {
   if (logType === 'warn') {
     return colorette.yellow(text);
-  }
-  if (logType === 'error') {
+  } else if (logType === 'error') {
     return colorette.red(text);
   }
 

@@ -1,4 +1,4 @@
-import type { SendProgress } from '../../types.js';
+import type { SendProgress } from '../../types';
 
 /**
  * Delegate with implementation for compiler-specific functions.
@@ -15,7 +15,7 @@ export interface CompilerDelegate {
    */
   getAsset: (
     filename: string,
-    platform: string | undefined,
+    platform: string,
     sendProgress?: SendProgress
   ) => Promise<string | Buffer>;
 
@@ -28,7 +28,7 @@ export interface CompilerDelegate {
    */
   getMimeType: (
     filename: string,
-    platform: string | undefined,
+    platform: string,
     data: string | Buffer
   ) => string;
 

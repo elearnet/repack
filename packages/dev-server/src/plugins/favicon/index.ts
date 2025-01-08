@@ -1,1 +1,1 @@
-export { default } from './faviconPlugin.js';
+export { default } from './faviconPlugin';

@@ -1,17 +1,19 @@
 import type { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import type { Server } from '../../types.js';
-import { WebSocketRouter } from './WebSocketRouter.js';
-import { WebSocketServerAdapter } from './WebSocketServerAdapter.js';
-import { WebSocketApiServer } from './servers/WebSocketApiServer.js';
-import { WebSocketDevClientServer } from './servers/WebSocketDevClientServer.js';
-import { WebSocketEventsServer } from './servers/WebSocketEventsServer.js';
-import { WebSocketHMRServer } from './servers/WebSocketHMRServer.js';
-import { WebSocketMessageServer } from './servers/WebSocketMessageServer.js';
+import type { Server } from '../../types';
+import { WebSocketDebuggerServer } from './servers/WebSocketDebuggerServer';
+import { WebSocketDevClientServer } from './servers/WebSocketDevClientServer';
+import { WebSocketMessageServer } from './servers/WebSocketMessageServer';
+import { WebSocketEventsServer } from './servers/WebSocketEventsServer';
+import { WebSocketApiServer } from './servers/WebSocketApiServer';
+import { WebSocketHMRServer } from './servers/WebSocketHMRServer';
+import { WebSocketRouter } from './WebSocketRouter';
+import { WebSocketServerAdapter } from './WebSocketServerAdapter';
 
 declare module 'fastify' {
   interface FastifyInstance {
     wss: {
+      debuggerServer: WebSocketDebuggerServer;
       devClientServer: WebSocketDevClientServer;
       messageServer: WebSocketMessageServer;
       eventsServer: WebSocketEventsServer;
@@ -43,6 +45,7 @@ async function wssPlugin(
 ) {
   const router = new WebSocketRouter(instance);
 
+  const debuggerServer = new WebSocketDebuggerServer(instance);
   const devClientServer = new WebSocketDevClientServer(instance);
   const messageServer = new WebSocketMessageServer(instance);
   const eventsServer = new WebSocketEventsServer(instance, {
@@ -64,6 +67,7 @@ async function wssPlugin(
     options.endpoints?.[WS_DEBUGGER_URL]
   );
 
+  router.registerServer(debuggerServer);
   router.registerServer(devClientServer);
   router.registerServer(messageServer);
   router.registerServer(eventsServer);
@@ -73,6 +77,7 @@ async function wssPlugin(
   router.registerServer(debuggerConnectionServer);
 
   instance.decorate('wss', {
+    debuggerServer,
     devClientServer,
     messageServer,
     eventsServer,

@@ -1,6 +1,9 @@
-global.__DEV__ = false;
+const { Headers } = require('headers-polyfill');
 
-// Increase the number of listeners to avoid MaxListenersExceededWarning
-// caused by RspackVirtualModulesPlugin
-// https://github.com/rspack-contrib/rspack-plugin-virtual-module/blob/827e9cbbf1e23eff4f0cd5b01fb2f3f319fce8f9/src/index.ts#L58
-process.setMaxListeners(100);
+jest.spyOn(process, 'cwd').mockImplementation(() => '/a/b/c');
+
+global.__DEV__ = false;
+global.__repack__ = { loadChunkCallback: [] };
+global.__webpack_get_script_filename__ = (url) => `${url}.chunk.bundle`;
+global.Headers = Headers;
+global.FormData = class FormData {};

@@ -1,8 +1,9 @@
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import { Text } from './Text';
-import type { WithChildren } from './types';
+import { WithChildren } from './types';
 
 type SectionProps = WithChildren<{
   title: string;

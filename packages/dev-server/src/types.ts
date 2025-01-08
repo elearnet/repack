@@ -1,26 +1,19 @@
 import type { FastifyBaseLogger } from 'fastify';
 import type { WebSocketServer } from 'ws';
-import type { CompilerDelegate } from './plugins/compiler/types.js';
-import type {
-  CodeFrame,
-  InputStackFrame,
-  ReactNativeStackFrame,
-  StackFrame,
-  SymbolicatorDelegate,
-  SymbolicatorResults,
-} from './plugins/symbolicate/types.js';
-import type { HmrDelegate } from './plugins/wss/types.js';
+import type { CompilerDelegate } from './plugins/compiler';
+import type { SymbolicatorDelegate } from './plugins/symbolicate';
+import type { HmrDelegate } from './plugins/wss';
 
-export type { CompilerDelegate };
+export type { CompilerDelegate } from './plugins/compiler';
 export type {
-  CodeFrame,
-  InputStackFrame,
-  ReactNativeStackFrame,
-  StackFrame,
   SymbolicatorDelegate,
+  ReactNativeStackFrame,
+  InputStackFrame,
+  StackFrame,
+  CodeFrame,
   SymbolicatorResults,
-};
-export type { HmrDelegate };
+} from './plugins/symbolicate';
+export type { HmrDelegate } from './plugins/wss';
 
 export namespace Server {
   /** Development server configuration. */
@@ -28,8 +21,14 @@ export namespace Server {
     /** Development server options to configure e.g: `port`, `host` etc. */
     options: Options;
 
+    experiments?: Experiments;
+
     /** Function to create a delegate, which implements crucial functionalities. */
     delegate: (context: DelegateContext) => Delegate;
+  }
+
+  export interface Experiments {
+    experimentalDebugger?: boolean;
   }
 
   /** Development server options. */
@@ -57,9 +56,6 @@ export namespace Server {
 
     /** Additional endpoints with pre-configured servers */
     endpoints?: Record<string, WebSocketServer>;
-
-    /** Whether to enable logging requests. */
-    logRequests?: boolean;
   }
 
   /**

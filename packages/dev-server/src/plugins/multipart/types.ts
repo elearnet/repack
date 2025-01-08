@@ -1,4 +1,4 @@
-import type { IncomingHttpHeaders } from 'node:http';
+import type { IncomingHttpHeaders } from 'http';
 
 export interface MultipartHandler {
   writeChunk: <T>(

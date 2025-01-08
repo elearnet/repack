@@ -1,8 +1,7 @@
-import NativeScriptManager, {
-  type NormalizedScriptLocator,
-} from '../NativeScriptManager.js';
-import { Script } from '../Script.js';
-import { ScriptManager } from '../ScriptManager.js';
+/* eslint-disable require-await */
+/* globals globalThis */
+import { Script } from '../Script';
+import { ScriptManager } from '../ScriptManager';
 
 jest.mock('../NativeScriptManager', () => ({
   loadScript: jest.fn(),
@@ -19,15 +18,11 @@ jest.mock('../NativeScriptManager', () => ({
   },
 }));
 
+// @ts-ignore
 globalThis.__webpack_require__ = {
-  i: [],
   u: (id: string) => `${id}.chunk.bundle`,
-  p: () => '',
-  repack: {
-    loadScript: jest.fn(),
-    loadHotUpdate: jest.fn(),
-    shared: { scriptManager: undefined },
-  },
+  p: '',
+  repack: { shared: { loadScriptCallback: [] } },
 };
 
 class FakeCache {
@@ -46,67 +41,37 @@ class FakeCache {
   }
 }
 
-class ScriptLoaderError extends Error {
-  code: string;
-
-  constructor(message: string, code: string) {
-    super(message);
-    this.code = code;
-  }
-}
-
 beforeEach(() => {
-  ScriptManager.init();
-});
-
-afterEach(() => {
-  globalThis.__webpack_require__.repack.shared.scriptManager = undefined;
+  try {
+    ScriptManager.shared.__destroy();
+  } catch {
+    // NOOP
+  }
 });
 
 describe('ScriptManagerAPI', () => {
   it('throw error if ScriptManager NativeModule was not found', async () => {
-    // @ts-expect-error simulat missing native module
     await expect(() => new ScriptManager(null).shared).toThrow(
       /repack react-native module was not found/
     );
   });
 
   it('throw error if there are no resolvers', async () => {
-    const spy = jest.spyOn(console, 'error').mockImplementationOnce(() => {});
-
     await expect(
       ScriptManager.shared.resolveScript('src_App_js', 'main')
     ).rejects.toThrow(/Error: No script resolvers were added/);
-
-    expect(spy).toHaveBeenCalled();
-    expect(spy.mock.calls[0][0]).toEqual(
-      expect.stringMatching(
-        /^\[ScriptManager\] Failed while resolving script locator/
-      )
-    );
   });
 
   it('throw error if no resolvers handled request', async () => {
-    const spy = jest.spyOn(console, 'error').mockImplementationOnce(() => {});
-
     ScriptManager.shared.addResolver(async () => undefined);
     ScriptManager.shared.addResolver(async () => undefined);
 
     await expect(
       ScriptManager.shared.resolveScript('src_App_js', 'main')
     ).rejects.toThrow(/No resolver was able to resolve script src_App_js/);
-
-    expect(spy).toHaveBeenCalled();
-    expect(spy.mock.calls[0][0]).toEqual(
-      expect.stringMatching(
-        /^\[ScriptManager\] Failed while resolving script locator/
-      )
-    );
   });
 
   it('remove all resolvers', async () => {
-    const spy = jest.spyOn(console, 'error').mockImplementationOnce(() => {});
-
     ScriptManager.shared.addResolver(async () => undefined);
     ScriptManager.shared.addResolver(async () => undefined);
     ScriptManager.shared.removeAllResolvers();
@@ -114,13 +79,6 @@ describe('ScriptManagerAPI', () => {
     await expect(
       ScriptManager.shared.resolveScript('src_App_js', 'main')
     ).rejects.toThrow(/Error: No script resolvers were added/);
-
-    expect(spy).toHaveBeenCalled();
-    expect(spy.mock.calls[0][0]).toEqual(
-      expect.stringMatching(
-        /^\[ScriptManager\] Failed while resolving script locator/
-      )
-    );
   });
 
   it('should generate uniqueId', async () => {
@@ -183,8 +141,6 @@ describe('ScriptManagerAPI', () => {
       verifyScriptSignature: 'off',
       uniqueId: 'main_src_App_js',
     });
-
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
 
     const {
       locator: { fetch },
@@ -438,7 +394,6 @@ describe('ScriptManagerAPI', () => {
       'src_App_js',
       'main'
     );
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
     expect(script1.locator.fetch).toBe(false);
 
     ScriptManager.shared.removeAllResolvers();
@@ -458,7 +413,6 @@ describe('ScriptManagerAPI', () => {
       'src_App_js',
       'main'
     );
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
     expect(script2.locator.fetch).toBe(true);
 
     ScriptManager.shared.removeAllResolvers();
@@ -478,7 +432,6 @@ describe('ScriptManagerAPI', () => {
       'src_App_js',
       'main'
     );
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
     expect(script3.locator.fetch).toBe(true);
 
     ScriptManager.shared.removeAllResolvers();
@@ -502,7 +455,6 @@ describe('ScriptManagerAPI', () => {
       'src_App_js',
       'main'
     );
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
     expect(script4.locator.fetch).toBe(true);
 
     ScriptManager.shared.removeAllResolvers();
@@ -526,7 +478,6 @@ describe('ScriptManagerAPI', () => {
       'src_App_js',
       'main'
     );
-    await ScriptManager.shared.loadScript('src_App_js', 'main');
     expect(script5.locator.fetch).toBe(false);
 
     ScriptManager.shared.removeAllResolvers();
@@ -552,342 +503,4 @@ describe('ScriptManagerAPI', () => {
     );
     expect(script6.locator.fetch).toBe(true);
   });
-
-  it('should throw an error on non-network errors occurrence in load script with retry', async () => {
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-    ScriptManager.shared.addResolver(async (scriptId, caller) => {
-      expect(caller).toEqual('appB');
-
-      return {
-        url: Script.getRemoteURL(`http://domain.ext/${scriptId}`),
-        retry: 2,
-        retryDelay: 100,
-      };
-    });
-
-    const scriptId = 'src_App_js';
-    const script = await ScriptManager.shared.resolveScript(scriptId, 'appB');
-    expect(script.locator).toEqual({
-      url: 'http://domain.ext/src_App_js.chunk.bundle',
-      fetch: true,
-      absolute: false,
-      method: 'GET',
-      timeout: Script.DEFAULT_TIMEOUT,
-      verifyScriptSignature: 'off',
-      uniqueId: 'appB_' + scriptId,
-      retry: 2,
-      retryDelay: 100,
-    });
-
-    jest.useFakeTimers({ advanceTimers: true });
-    jest.spyOn(global, 'setTimeout');
-
-    // Mock the nativeScriptManager.loadScript to fail immediately on non network error
-    jest
-      .mocked(NativeScriptManager.loadScript)
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('First attempt failed', 'ScriptEvalFailure')
-      );
-
-    await expect(
-      ScriptManager.shared.loadScript(scriptId, 'appB')
-    ).rejects.toThrow('First attempt failed');
-
-    expect(setTimeout).toHaveBeenCalledTimes(0);
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledTimes(1);
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledWith(scriptId, {
-      absolute: false,
-      fetch: true,
-      method: 'GET',
-      retry: 2,
-      retryDelay: 100,
-      timeout: 30000,
-      uniqueId: 'appB_' + scriptId,
-      url: 'http://domain.ext/src_App_js.chunk.bundle',
-      verifyScriptSignature: 'off',
-    });
-    jest.useRealTimers();
-  });
-
-  it('should load script with retry', async () => {
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-    ScriptManager.shared.addResolver(async (scriptId, caller) => {
-      expect(caller).toEqual('main');
-
-      return {
-        url: Script.getRemoteURL(`http://domain.ext/${scriptId}`),
-        retry: 2,
-        retryDelay: 100,
-      };
-    });
-
-    const scriptId = 'src_App_js';
-    const script = await ScriptManager.shared.resolveScript(scriptId, 'main');
-    expect(script.locator).toEqual({
-      url: 'http://domain.ext/src_App_js.chunk.bundle',
-      fetch: true,
-      absolute: false,
-      method: 'GET',
-      timeout: Script.DEFAULT_TIMEOUT,
-      verifyScriptSignature: 'off',
-      uniqueId: 'main_src_App_js',
-      retry: 2,
-      retryDelay: 100,
-    });
-
-    // Mock the nativeScriptManager.loadScript to fail twice and succeed on the third attempt
-    jest
-      .mocked(NativeScriptManager.loadScript)
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('First attempt failed', 'RequestFailure')
-      )
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('Second attempt failed', 'RequestFailure')
-      )
-      .mockResolvedValueOnce(null);
-
-    jest.useFakeTimers({ advanceTimers: true });
-    await ScriptManager.shared.loadScript(scriptId, 'main');
-
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledTimes(3);
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledWith(scriptId, {
-      absolute: false,
-      fetch: true,
-      method: 'GET',
-      retry: 2,
-      retryDelay: 100,
-      timeout: 30000,
-      uniqueId: 'main_src_App_js',
-      url: 'http://domain.ext/src_App_js.chunk.bundle',
-      verifyScriptSignature: 'off',
-    });
-    jest.useRealTimers();
-  });
-
-  it('should throw error if all retry attempts fail', async () => {
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-    ScriptManager.shared.addResolver(async (scriptId) => {
-      return {
-        url: Script.getRemoteURL(`http://domain.ext/${scriptId}`),
-        retry: 2,
-        fetch: false,
-        retryDelay: 100,
-      };
-    });
-
-    const scriptId = 'src_App_js';
-    // Mock the nativeScriptManager.loadScript to fail all attempts
-    jest
-      .mocked(NativeScriptManager.loadScript)
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('First attempt failed', 'NetworkFailure')
-      )
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('Second attempt failed', 'NetworkFailure')
-      )
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('Third attempt failed', 'NetworkFailure')
-      );
-
-    jest.useFakeTimers({ advanceTimers: true });
-    await expect(ScriptManager.shared.loadScript(scriptId)).rejects.toThrow(
-      'Third attempt failed'
-    );
-
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledTimes(3);
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledWith(scriptId, {
-      absolute: false,
-      fetch: true,
-      method: 'GET',
-      retry: 2,
-      retryDelay: 100,
-      timeout: 30000,
-      uniqueId: scriptId,
-      url: 'http://domain.ext/src_App_js.chunk.bundle',
-      verifyScriptSignature: 'off',
-    });
-    jest.useRealTimers();
-  });
-
-  it('should retry with delay', async () => {
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-    ScriptManager.shared.addResolver(async (scriptId) => {
-      return {
-        url: Script.getRemoteURL(`http://domain.ext/${scriptId}`),
-        retry: 2,
-        retryDelay: 100,
-      };
-    });
-
-    const scriptId = 'src_App_js';
-    // Mock the nativeScriptManager.loadScript to fail twice and succeed on the third attempt
-    jest
-      .mocked(NativeScriptManager.loadScript)
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('First attempt failed', 'ScriptDownloadFailure')
-      )
-      .mockRejectedValueOnce(
-        new ScriptLoaderError('Second attempt failed', 'ScriptDownloadFailure')
-      )
-      .mockResolvedValueOnce(null);
-
-    jest.useFakeTimers({ advanceTimers: true });
-    jest.spyOn(global, 'setTimeout');
-
-    const loadScriptPromise = ScriptManager.shared.loadScript(scriptId);
-
-    await expect(loadScriptPromise).resolves.toBeUndefined();
-
-    expect(setTimeout).toHaveBeenCalledTimes(2);
-    expect(NativeScriptManager.loadScript).toHaveBeenCalledTimes(3);
-    jest.useRealTimers();
-  });
-
-  it('should await loadScript with same scriptId to finish', async () => {
-    const spy = mockLoadScriptBasedOnFetch();
-
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-
-    ScriptManager.shared.addResolver(async (scriptId, _caller) => {
-      return {
-        url: Script.getRemoteURL(scriptId),
-        cache: true,
-      };
-    });
-
-    let loadingScriptIsFinished = false;
-
-    // loadScript should wait first time called loadScript although we are not awaited, because scriptId is same
-    ScriptManager.shared.loadScript('miniApp').then(() => {
-      loadingScriptIsFinished = true;
-    });
-    await ScriptManager.shared.loadScript('miniApp');
-
-    expect(loadingScriptIsFinished).toEqual(true);
-
-    spy.mockRestore();
-  });
-
-  it('should wait loadScript with same scriptId to finished in a complex scenario', async () => {
-    const spy = mockLoadScriptBasedOnFetch();
-
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-
-    ScriptManager.shared.addResolver(async (scriptId, _caller) => {
-      return {
-        url: Script.getRemoteURL(scriptId),
-        cache: true,
-      };
-    });
-
-    let loadingScriptIsFinished = false;
-    let loadingScript2IsFinished = false;
-
-    // loadScript should wait first time called loadScript although we are not awaited, because scriptId is same
-    ScriptManager.shared.loadScript('miniApp').then(() => {
-      loadingScriptIsFinished = true;
-    });
-
-    ScriptManager.shared.loadScript('miniApp2').then(() => {
-      loadingScript2IsFinished = true;
-    });
-    await ScriptManager.shared.loadScript('miniApp');
-    expect(loadingScriptIsFinished).toEqual(true);
-
-    loadingScriptIsFinished = false;
-    ScriptManager.shared.loadScript('miniApp').then(() => {
-      loadingScriptIsFinished = true;
-    });
-
-    ScriptManager.shared.loadScript('miniApp2');
-    await ScriptManager.shared.loadScript('miniApp');
-
-    expect(loadingScriptIsFinished).toEqual(true);
-    await ScriptManager.shared.loadScript('miniApp2');
-    expect(loadingScript2IsFinished).toEqual(true);
-
-    spy.mockRestore();
-  });
-
-  it('should wait loadScript and prefetchScript', async () => {
-    const spy = mockLoadScriptBasedOnFetch();
-
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-
-    ScriptManager.shared.addResolver(async (scriptId, _caller) => {
-      return {
-        url: Script.getRemoteURL(scriptId),
-        cache: true,
-      };
-    });
-
-    let prefetchScriptIsFinished = false;
-
-    // loadScript should wait first time called loadScript although we are not awaited, because scriptId is same
-    ScriptManager.shared.prefetchScript('miniApp').then(() => {
-      prefetchScriptIsFinished = true;
-    });
-    await ScriptManager.shared.loadScript('miniApp');
-
-    expect(prefetchScriptIsFinished).toEqual(true);
-
-    spy.mockRestore();
-  });
-
-  it('should refetch failed script', async () => {
-    jest.useFakeTimers({ advanceTimers: true });
-    const spy = jest.spyOn(NativeScriptManager, 'loadScript');
-
-    spy.mockRejectedValueOnce(
-      (_scriptId: string, _scriptConfig: NormalizedScriptLocator) =>
-        Promise.reject({ code: 'NetworkFailed' })
-    );
-
-    const cache = new FakeCache();
-    ScriptManager.shared.setStorage(cache);
-
-    ScriptManager.shared.addResolver(async (scriptId, _caller) => {
-      return {
-        url: Script.getRemoteURL(scriptId),
-        cache: true,
-      };
-    });
-
-    await expect(async () =>
-      ScriptManager.shared.loadScript('miniApp')
-    ).rejects.toThrow();
-
-    // //expected to cache be empty
-    expect(Object.keys(cache.data).length).toBe(0);
-
-    await ScriptManager.shared.loadScript('miniApp');
-
-    // expected to fetch again
-    expect(spy.mock.lastCall?.[1].fetch).toBe(true);
-
-    spy.mockRestore();
-  });
 });
-
-function mockLoadScriptBasedOnFetch() {
-  jest.useFakeTimers({ advanceTimers: true });
-  const spy = jest.spyOn(NativeScriptManager, 'loadScript');
-
-  spy.mockImplementation(
-    (_scriptId: string, scriptConfig: NormalizedScriptLocator) =>
-      scriptConfig.fetch
-        ? new Promise<null>((resolve) => {
-            setTimeout(() => resolve(null), 10);
-          })
-        : Promise.resolve(null)
-  );
-
-  return spy;
-}

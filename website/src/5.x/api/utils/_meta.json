@@ -1,8 +1,0 @@
-[
-  "constants",
-  "get-asset-extension-regexp",
-  "get-dirname",
-  "get-module-paths",
-  "get-public-path",
-  "get-resolve-options"
-]

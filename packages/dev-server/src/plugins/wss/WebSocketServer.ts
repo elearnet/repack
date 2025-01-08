@@ -1,12 +1,12 @@
-import type { IncomingMessage } from 'node:http';
-import type { Socket } from 'node:net';
+import type { IncomingMessage } from 'http';
+import type { Socket } from 'net';
 import type { FastifyInstance } from 'fastify';
 import {
-  type ServerOptions,
-  type WebSocket,
+  ServerOptions,
+  WebSocket,
   WebSocketServer as WebSocketServerImpl,
 } from 'ws';
-import type { WebSocketServerInterface } from './types.js';
+import { WebSocketServerInterface } from './types';
 
 /**
  * Abstract class for providing common logic (eg routing) for all WebSocket servers.

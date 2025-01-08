@@ -1,8 +1,8 @@
-import type { IncomingMessage } from 'node:http';
-import { URL } from 'node:url';
+import type { IncomingMessage } from 'http';
+import { URL } from 'url';
 import type { FastifyInstance } from 'fastify';
-import type WebSocket from 'ws';
-import { WebSocketServer } from '../WebSocketServer.js';
+import WebSocket from 'ws';
+import { WebSocketServer } from '../WebSocketServer';
 
 /**
  * Holds {@link ReactNativeMessage} `id` data.
@@ -121,7 +121,7 @@ export class WebSocketMessageServer extends WebSocketServer {
         msg: 'Received message had wrong protocol version',
         message,
       });
-    } catch {
+    } catch (e) {
       this.fastify.log.error({
         msg: 'Failed to parse the message as JSON',
         data,
@@ -268,11 +268,11 @@ export class WebSocketMessageServer extends WebSocketServer {
           if (clientId !== peerId) {
             const { searchParams } = new URL(peerSocket.upgradeReq?.url || '');
             output[peerId] = [...searchParams.entries()].reduce(
-              (acc, [key, value]) => {
-                acc[key] = value;
-                return acc;
-              },
-              {} as Record<string, string>
+              (acc, [key, value]) => ({
+                ...acc,
+                [key]: value,
+              }),
+              {}
             );
           }
         });
@@ -357,7 +357,7 @@ export class WebSocketMessageServer extends WebSocketServer {
    */
   onConnection(socket: WebSocket, request: IncomingMessage) {
     const clientId = `client#${this.nextClientId++}`;
-    const client: WebSocketWithUpgradeReq = socket;
+    let client: WebSocketWithUpgradeReq = socket;
     client.upgradeReq = request;
     this.clients.set(clientId, client);
     this.fastify.log.debug({ msg: 'Message client connected', clientId });

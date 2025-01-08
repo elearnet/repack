@@ -1,10 +1,13 @@
-import type { HMRMessage, HMRMessageBody } from '../types.js';
-import { getDevServerLocation } from './getDevServerLocation.js';
+/* eslint-env browser */
+/* globals __webpack_hash__, __DEV__, __PLATFORM__, __PUBLIC_PORT__, __REACT_NATIVE_MINOR_VERSION__ */
 
-interface LoadingViewModule {
+import type { HMRMessage, HMRMessageBody } from '../types';
+import { getDevServerLocation } from './getDevServerLocation';
+
+type LoadingViewUtil = {
+  showMessage(text: string, type: 'load' | 'refresh'): void;
   hide(): void;
-  showMessage(text: string, type: string): void;
-}
+};
 
 class HMRClient {
   url: string;
@@ -15,27 +18,28 @@ class HMRClient {
     private app: {
       reload: () => void;
       dismissErrors: () => void;
-      showLoadingView: (text: string, type: 'load' | 'refresh') => void;
-      hideLoadingView: () => void;
+      LoadingView: LoadingViewUtil;
     }
   ) {
-    this.url = `ws://${getDevServerLocation().host}/__hmr?platform=${__PLATFORM__}`;
+    this.url = `ws://${
+      getDevServerLocation().hostname
+    }:${__PUBLIC_PORT__}/__hmr?platform=${__PLATFORM__}`;
     this.socket = new WebSocket(this.url);
 
-    console.debug('[HMRClient] Connecting...', {
+    console.log('[HMRClient] Connecting...', {
       url: this.url,
     });
 
     this.socket.onopen = () => {
-      console.debug('[HMRClient] Connected');
+      console.log('[HMRClient] Connected');
     };
 
     this.socket.onclose = () => {
-      console.debug('[HMRClient] Disconnected');
+      console.log('[HMRClient] Disconnected');
     };
 
     this.socket.onerror = (event) => {
-      console.debug('[HMRClient] Error', event);
+      console.log('[HMRClient] Error', event);
     };
 
     this.socket.onmessage = (event) => {
@@ -57,13 +61,13 @@ class HMRClient {
   processMessage(message: HMRMessage) {
     switch (message.action) {
       case 'building':
-        this.app.showLoadingView('Rebuilding...', 'refresh');
-        console.debug('[HMRClient] Bundle rebuilding', {
+        this.app.LoadingView.showMessage('Rebuilding...', 'refresh');
+        console.log('[HMRClient] Bundle rebuilding', {
           name: message.body?.name,
         });
         break;
       case 'built':
-        console.debug('[HMRClient] Bundle rebuilt', {
+        console.log('[HMRClient] Bundle rebuilt', {
           name: message.body?.name,
           time: message.body?.time,
         });
@@ -78,7 +82,7 @@ class HMRClient {
           message.body.errors.forEach((error) => {
             console.error('Cannot apply update due to error:', error);
           });
-          this.app.hideLoadingView();
+          this.app.LoadingView.hide();
           return;
         }
 
@@ -98,14 +102,14 @@ class HMRClient {
     }
 
     if (!this.upToDate(update.hash) && module.hot.status() === 'idle') {
-      console.debug('[HMRClient] Checking for updates on the server...');
+      console.log('[HMRClient] Checking for updates on the server...');
       void this.checkUpdates(update);
     }
   }
 
   async checkUpdates(update: HMRMessageBody) {
     try {
-      this.app.showLoadingView('Refreshing...', 'refresh');
+      this.app.LoadingView.showMessage('Refreshing...', 'refresh');
       const updatedModules = await module.hot?.check(false);
       if (!updatedModules) {
         console.warn('[HMRClient] Cannot find update - full reload needed');
@@ -126,19 +130,13 @@ class HMRClient {
       });
 
       if (!this.upToDate()) {
+        // TODO - determine whether we should do early return here
         void this.checkUpdates(update);
-        return;
-      }
-
-      // No modules updated - leave everything as it is (including errors)
-      if (!renewedModules || renewedModules.length === 0) {
-        console.debug('[HMRClient] No renewed modules - app is up to date');
-        return;
       }
 
       // Double check to make sure all updated modules were accepted (renewed)
       const unacceptedModules = updatedModules.filter((moduleId) => {
-        return renewedModules.indexOf(moduleId) < 0;
+        return renewedModules && renewedModules.indexOf(moduleId) < 0;
       });
 
       if (unacceptedModules.length) {
@@ -148,7 +146,7 @@ class HMRClient {
         );
         this.app.reload();
       } else {
-        console.debug('[HMRClient] Renewed modules - app is up to date', {
+        console.log('[HMRClient] Renewed modules - app is up to date', {
           renewedModules,
         });
         this.app.dismissErrors();
@@ -164,19 +162,26 @@ class HMRClient {
         console.warn('[HMRClient] Update check failed', { error });
       }
     } finally {
-      this.app.hideLoadingView();
+      this.app.LoadingView.hide();
     }
   }
 }
 
 if (__DEV__ && module.hot) {
-  const reload = () => {
-    const DevSettings = require('react-native/Libraries/Utilities/DevSettings');
-    DevSettings.reload();
+  const { DevSettings, Platform } = require('react-native');
+  let LoadingView: LoadingViewUtil = {
+    showMessage: () => {},
+    hide: () => {},
   };
 
+  if (__REACT_NATIVE_MINOR_VERSION__ >= 75) {
+    LoadingView = require('react-native/Libraries/Utilities/DevLoadingView');
+  } else {
+    LoadingView = require('react-native/Libraries/Utilities/LoadingView');
+  }
+
+  const reload = () => DevSettings.reload();
   const dismissErrors = () => {
-    const Platform = require('react-native/Libraries/Utilities/Platform');
     if (Platform.OS === 'ios') {
       const NativeRedBox =
         require('react-native/Libraries/NativeModules/specs/NativeRedBox').default;
@@ -186,38 +191,10 @@ if (__DEV__ && module.hot) {
         require('react-native/Libraries/Core/NativeExceptionsManager').default;
       NativeExceptionsManager?.dismissRedbox();
     }
+
     const LogBoxData = require('react-native/Libraries/LogBox/Data/LogBoxData');
     LogBoxData.clear();
   };
 
-  const showLoadingView = (text: string, type: 'load' | 'refresh') => {
-    let LoadingView: LoadingViewModule;
-    if (__REACT_NATIVE_MINOR_VERSION__ >= 75) {
-      LoadingView = require('react-native/Libraries/Utilities/DevLoadingView');
-    } else {
-      LoadingView = require('react-native/Libraries/Utilities/LoadingView');
-    }
-
-    // @ts-ignore
-    LoadingView.showMessage(text, type);
-  };
-
-  const hideLoadingView = () => {
-    let LoadingView: LoadingViewModule;
-    if (__REACT_NATIVE_MINOR_VERSION__ >= 75) {
-      LoadingView = require('react-native/Libraries/Utilities/DevLoadingView');
-    } else {
-      LoadingView = require('react-native/Libraries/Utilities/LoadingView');
-    }
-
-    // @ts-ignore
-    LoadingView.hide();
-  };
-
-  new HMRClient({
-    reload,
-    dismissErrors,
-    showLoadingView,
-    hideLoadingView,
-  });
+  new HMRClient({ reload, dismissErrors, LoadingView });
 }

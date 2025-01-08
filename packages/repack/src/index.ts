@@ -1,6 +1,8 @@
-export * as plugins from './plugins/index.js';
-export * from './plugins/RepackPlugin.js';
-export * from './types.js';
-export * from './logging/index.js';
-export * from './rules/index.js';
-export * from './utils/index.js';
+export * as plugins from './webpack/plugins';
+export * from './webpack/plugins/RepackPlugin';
+export * from './webpack/utils';
+export * from './webpack/federated';
+export * from './commands/bundle';
+export * from './commands/start';
+export * from './types';
+export * from './logging';

@@ -2,7 +2,7 @@
   <img src="./logo.png">
 </p>
 <p align="center">
-A toolkit to build your React Native application with Rspack or Webpack.
+A Webpack-based toolkit to build your React Native application with full support of Webpack ecosystem.
 </p>
 
 ---
@@ -17,7 +17,9 @@ A toolkit to build your React Native application with Rspack or Webpack.
 
 Re.Pack is a next generation of [Haul](https://github.com/callstack/haul) — a Webpack-based bundler for React Native applications.
 
-Re.Pack uses Rspack (or Webpack 5) and React Native Community CLI's plugin system to allow you to bundle your application using Webpack and easily switch from Metro.
+Re.Pack uses Webpack 5 and React Native CLI's plugin system to allow you to bundle your application using Webpack and allow to easily switch from Metro.
+
+**Check the base [`webpack.config.cjs`](https://github.com/callstack/repack/blob/main/templates/webpack.config.cjs) or [`webpack.config.mjs`](https://github.com/callstack/repack/blob/main/templates/webpack.config.mjs) template, if you're curious how it all looks like.**
 
 ## Features
 
@@ -53,7 +55,6 @@ Re.Pack uses Rspack (or Webpack 5) and React Native Community CLI's plugin syste
 - [x] [Module Federation](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669) support
 - [x] Code signing and verification
 - [x] `@callstack/repack-init` - tool that automates the integration of the Re.Pack into React Native projects
-- [x] Rspack support
 
 ### Examples
 
@@ -63,7 +64,7 @@ For a more comprehensive example of a Super App setup with Module Federation ple
 
 ## Documentation
 
-The documentation is available at [re-pack.dev](https://re-pack.dev).
+The documentation is available at: https://re-pack.dev
 
 You can also use the following links to jump to specific topics:
 

@@ -156,23 +156,6 @@ RCT_EXPORT_METHOD(invalidateScripts
   }];
 }
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
-                                       : (NSString *)scriptSource scriptSourceUrl
-                                       : (NSString *)scriptSourceUrl)
-{
-  facebook::jsi::Runtime *runtime = [self getJavaScriptRuntimePointer];
-
-  if (!runtime) {
-    @throw [NSError errorWithDomain:@"Can't access React Native runtime" code:0 userInfo:nil];
-  }
-
-  std::string source{[scriptSource UTF8String]};
-  std::string sourceUrl{[scriptSourceUrl UTF8String]};
-
-  runtime->evaluateJavaScript(std::make_unique<facebook::jsi::StringBuffer>(std::move(source)), sourceUrl);
-  return @YES;
-}
-
 - (void)execute:(ScriptConfig *)config resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
   NSString *scriptPath = [self getScriptFilePath:config.uniqueId];
@@ -189,7 +172,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
       @throw [NSError errorWithDomain:errorMessage code:0 userInfo:nil];
     }
 
-    [self evaluateJavascript:data url:config.sourceUrl resolve:resolve reject:reject];
+    [self evaluateJavascript:data url:config.url resolve:resolve reject:reject];
   } @catch (NSError *error) {
     reject(CodeExecutionFailure, error.domain, nil);
   }
@@ -304,7 +287,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
       filesystemScriptUrl = [[NSBundle mainBundle] URLForResource:scriptName withExtension:scriptExtension];
     }
     NSData *data = [[NSData alloc] initWithContentsOfFile:[filesystemScriptUrl path]];
-    [self evaluateJavascript:data url:config.sourceUrl resolve:resolve reject:reject];
+    [self evaluateJavascript:data url:filesystemScriptUrl resolve:resolve reject:reject];
   } @catch (NSError *error) {
     reject(CodeExecutionFailure, error.localizedDescription, nil);
   }
@@ -321,7 +304,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
 }
 
 - (void)evaluateJavascript:(NSData *)code
-                       url:(NSString *)url
+                       url:(NSURL *)url
                    resolve:(RCTPromiseResolveBlock)resolve
                     reject:(RCTPromiseRejectBlock)reject
 {
@@ -341,7 +324,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
   }
 
   std::string source{static_cast<const char *>([code bytes]), [code length]};
-  std::string sourceUrl{[url UTF8String]};
+  std::string sourceUrl{[[url absoluteString] UTF8String]};
 
   callInvoker->invokeAsync([source = std::move(source), sourceUrl = std::move(sourceUrl), runtime, resolve, reject]() {
     // use c++ error handling here

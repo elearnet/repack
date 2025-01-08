@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import type { Server } from '../../types.js';
-import type { SendProgress } from '../../types.js';
+import type { Server } from '../../types';
+import type { SendProgress } from '../../types';
 
 async function compilerPlugin(
   instance: FastifyInstance,
@@ -21,18 +21,28 @@ async function compilerPlugin(
       },
     },
     handler: async (request, reply) => {
-      const filename = (request.params as { '*'?: string })['*'];
+      let file = (request.params as { '*'?: string })['*'];
       let { platform } = request.query as { platform?: string };
 
-      if (!filename) {
+      if (!file) {
         // This technically should never happen - this route should not be called if file is missing.
-        request.log.error('File was not provided');
+        request.log.error(`File was not provided`);
         return reply.notFound();
       }
 
       // Let consumer infer the platform. If function is not provided fallback
       // to platform query param.
       platform = delegate.compiler.inferPlatform?.(request.url) ?? platform;
+
+      if (!platform) {
+        request.log.error('Cannot detect platform');
+        return reply.badRequest('Cannot detect platform');
+      }
+
+      // If platform happens to be in front of an asset remove it.
+      if (file.startsWith(`${platform}/`)) {
+        file = file.replace(`${platform}/`, '');
+      }
 
       const multipart = reply.asMultipart();
 
@@ -48,15 +58,11 @@ async function compilerPlugin(
 
       try {
         const asset = await delegate.compiler.getAsset(
-          filename,
+          file,
           platform,
           sendProgress
         );
-        const mimeType = delegate.compiler.getMimeType(
-          filename,
-          platform,
-          asset
-        );
+        const mimeType = delegate.compiler.getMimeType(file, platform, asset);
 
         if (multipart) {
           const buffer = Buffer.isBuffer(asset) ? asset : Buffer.from(asset);

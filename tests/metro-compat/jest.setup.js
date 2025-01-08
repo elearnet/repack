@@ -2,8 +2,6 @@ const testsToSkip = {
   describe: new Set([
     // unsupported in ehnanced-resolve as well
     '[unsupported] exotic nested arrays',
-    // irrelevant in webpack environment
-    '@babel/runtime compatibility (special case)',
   ]),
   test: new Set([
     // Non-strict package exports are not supported
@@ -38,12 +36,10 @@ const handler = {
   apply(target, _, args) {
     if (testsToSkip[target.name].has(args[0])) {
       return target.skip(...args);
-    }
-    if (testsToSkipOnce[target.name].has(args[0])) {
+    } else if (testsToSkipOnce[target.name].has(args[0])) {
       testsToSkipOnce[target.name].delete(args[0]);
       return target.skip(...args);
-    }
-    return target(...args);
+    } else return target(...args);
   },
 };
 

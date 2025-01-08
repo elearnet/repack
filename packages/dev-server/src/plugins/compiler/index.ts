@@ -1,2 +1,2 @@
-export { default } from './compilerPlugin.js';
-export * from './types.js';
+export { default } from './compilerPlugin';
+export * from './types';

@@ -1,2 +1,2 @@
-export * from './createServer.js';
-export * from './types.js';
+export * from './createServer';
+export * from './types';

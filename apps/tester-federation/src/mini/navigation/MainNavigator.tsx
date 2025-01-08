@@ -1,12 +1,15 @@
-import {
-  type NativeStackNavigationProp,
-  createNativeStackNavigator,
-} from '@react-navigation/native-stack';
+import React from 'react';
 import { StyleSheet } from 'react-native';
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 
+import HomeScreen from '../screens/HomeScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 
 export type MainStackParamList = {
+  Home: undefined;
   Gallery: undefined;
 };
 
@@ -19,14 +22,14 @@ const MainNavigator = () => {
   return (
     <Main.Navigator
       screenOptions={{
-        headerTitle: 'Gallery Mini App',
-        headerBackTitleVisible: true,
-        headerBackTitle: 'Back',
+        headerTitle: 'MiniApp',
+        headerBackTitleVisible: false,
         headerStyle: styles.header,
         headerTitleStyle: styles.headerTitle,
         headerTintColor: 'rgba(255,255,255,1)',
       }}
     >
+      <Main.Screen name="Home" component={HomeScreen} />
       <Main.Screen name="Gallery" component={GalleryScreen} />
     </Main.Navigator>
   );
@@ -34,10 +37,10 @@ const MainNavigator = () => {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#E68A00',
+    backgroundColor: 'rgba(79, 55, 139, 1)',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: 'rgba(255,255,255,1)',
   },
 });
 

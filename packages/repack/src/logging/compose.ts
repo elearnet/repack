@@ -1,4 +1,4 @@
-import type { Reporter } from './types.js';
+import type { Reporter } from './types';
 
 export function composeReporters(reporters: Reporter[]): Reporter {
   return {

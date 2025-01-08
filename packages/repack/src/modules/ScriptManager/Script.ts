@@ -1,10 +1,10 @@
 import shallowEqual from 'shallowequal';
+import type { ScriptLocator, WebpackContext } from './types';
 import {
-  type NormalizedScriptLocator,
+  NormalizedScriptLocator,
   NormalizedScriptLocatorHTTPMethod,
   NormalizedScriptLocatorSignatureVerificationMode,
-} from './NativeScriptManager.js';
-import type { ScriptLocator, WebpackContext } from './types.js';
+} from './NativeScriptManager';
 
 /**
  * Representation of a Script to load and execute, used by {@link ScriptManager}.
@@ -127,8 +127,6 @@ export class Script {
         url: locator.url,
         absolute: locator.absolute ?? false,
         timeout: locator.timeout ?? Script.DEFAULT_TIMEOUT,
-        retry: locator.retry,
-        retryDelay: locator.retryDelay,
         query: new URLSearchParams(locator.query).toString() || undefined,
         body,
         headers: Object.keys(headers).length ? headers : undefined,
@@ -152,10 +150,7 @@ export class Script {
   constructor(
     public readonly scriptId: string,
     public readonly caller: string | undefined,
-    public readonly locator: NormalizedScriptLocator & {
-      retry?: number;
-      retryDelay?: number;
-    },
+    public readonly locator: NormalizedScriptLocator,
     public readonly cache: boolean = true
   ) {}
 

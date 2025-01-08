@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'node:module';
+import { createRequire } from 'module';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -11,13 +11,6 @@ const info = require('../package.json');
 
 const argv = yargs(hideBin(process.argv))
   .usage(`Usage: ${info.name} [options]`)
-  .option('bundler', {
-    alias: 'b',
-    type: 'string',
-    choices: ['rspack', 'webpack'],
-    description: 'Specify the bundler to use',
-    default: 'rspack',
-  })
   .option('custom-version', {
     alias: 'c',
     type: 'string',
@@ -33,7 +26,7 @@ const argv = yargs(hideBin(process.argv))
     alias: 'f',
     type: 'string',
     choices: ['mjs', 'cjs'],
-    description: 'Format of the config file',
+    description: 'Format of the webpack.config file',
     default: 'mjs',
   })
   .option('verbose', {
@@ -49,7 +42,6 @@ const argv = yargs(hideBin(process.argv))
   .parseSync();
 
 void run({
-  bundler: argv.bundler as 'rspack' | 'webpack',
   entry: argv.entry,
   repackVersion: argv.customVersion,
   templateType: argv.format as 'mjs' | 'cjs',

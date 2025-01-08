@@ -1,11 +1,12 @@
-import {
-  type NativeStackNavigationProp,
-  createNativeStackNavigator,
-} from '@react-navigation/native-stack';
+import React from 'react';
 import { StyleSheet } from 'react-native';
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 
-import DetailScreen from '../screens/DetailScreen';
 import HomeScreen from '../screens/HomeScreen';
+import DetailScreen from '../screens/DetailScreen';
 import MiniAppScreen from '../screens/MiniAppScreen';
 
 export type MainStackParamList = {
@@ -23,10 +24,8 @@ const MainNavigator = () => {
   return (
     <Main.Navigator
       screenOptions={{
-        headerTitle: 'Host App',
-        headerBackTitleVisible: true,
-        headerBackTitle: 'Back',
-        headerLargeTitle: true,
+        headerTitle: 'HostApp',
+        headerBackTitleVisible: false,
         headerStyle: styles.header,
         headerTitleStyle: styles.headerTitle,
         headerTintColor: 'rgba(255,255,255,1)',
@@ -34,21 +33,17 @@ const MainNavigator = () => {
     >
       <Main.Screen name="Home" component={HomeScreen} />
       <Main.Screen name="Detail" component={DetailScreen} />
-      <Main.Screen
-        name="MiniApp"
-        component={MiniAppScreen}
-        options={{ headerStyle: { backgroundColor: '#FF9F00' } }}
-      />
+      <Main.Screen name="MiniApp" component={MiniAppScreen} />
     </Main.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#3498DB',
+    backgroundColor: 'rgba(56, 30, 114, 1)',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: 'rgba(255,255,255,1)',
   },
 });
 

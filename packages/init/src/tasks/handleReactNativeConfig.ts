@@ -1,12 +1,12 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 import dedent from 'dedent';
 
 import logger from '../utils/logger.js';
 
-const createDefaultConfig = (bundler: 'rspack' | 'webpack') => dedent`
+const defaultConfig = dedent`
   module.exports = {
-    commands: require('@callstack/repack/commands/${bundler}'),
+    commands: require('@callstack/repack/commands'),
   };`;
 
 /**
@@ -14,32 +14,29 @@ const createDefaultConfig = (bundler: 'rspack' | 'webpack') => dedent`
  *
  * @param cwd current working directory
  */
-export default function handleReactNativeConfig(
-  bundler: 'rspack' | 'webpack',
-  cwd: string
-): void {
+export default function handleReactNativeConfig(cwd: string): void {
   const configPath = path.join(cwd, 'react-native.config.js');
 
   if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, createDefaultConfig(bundler));
+    fs.writeFileSync(configPath, defaultConfig);
     logger.success('Created react-native.config.js');
     return;
   }
 
-  const configContent = fs.readFileSync(configPath, 'utf-8');
-  let updatedConfigContent: string;
+  let configContent = fs.readFileSync(configPath, 'utf-8');
+  let updatedConfigContent;
 
   if (!configContent.includes('commands:')) {
     updatedConfigContent = configContent.replace(
       'module.exports = {',
-      `module.exports = {\n  commands: require('@callstack/repack/commands/${bundler}'),`
+      "module.exports = {\n  commands: require('@callstack/repack/commands'),"
     );
   } else {
     const commandsIndex = configContent.indexOf('commands:');
     const commandsEndIndex = configContent.indexOf(',', commandsIndex);
     const commandsString = configContent.slice(commandsIndex, commandsEndIndex);
 
-    const newCommandsString = `commands: require('@callstack/repack/commands/${bundler}')`;
+    const newCommandsString = `commands: require('@callstack/repack/commands')`;
     if (commandsString === newCommandsString) {
       logger.success('File react-native.config.js is already up to date');
       return;

@@ -1,7 +1,7 @@
-import path from 'node:path';
-import { getResolveOptions } from '@callstack/repack';
-import type * as EnhancedResolveNS from 'enhanced-resolve';
+import path from 'path';
 import memfs from 'memfs';
+import { getResolveOptions } from '@callstack/repack/dist/webpack/utils/getResolveOptions';
+import type * as EnhancedResolveNS from 'enhanced-resolve';
 import type { PackageJson } from 'type-fest';
 
 type EnhancedResolve = typeof EnhancedResolveNS;

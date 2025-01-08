@@ -1,8 +1,8 @@
 import type { IncomingMessage } from 'node:http';
 import type { Socket } from 'node:net';
 import type { FastifyInstance } from 'fastify';
-import type { WebSocketServer } from 'ws';
-import type { WebSocketServerInterface } from './types.js';
+import type { WebSocketServer as WebSocketServer } from 'ws';
+import type { WebSocketServerInterface } from './types';
 
 export class WebSocketServerAdapter implements WebSocketServerInterface {
   constructor(
@@ -20,8 +20,8 @@ export class WebSocketServerAdapter implements WebSocketServerInterface {
   }
 
   upgrade(request: IncomingMessage, socket: Socket, head: Buffer) {
-    this.server?.handleUpgrade(request, socket, head, (webSocket) => {
-      this.server?.emit('connection', webSocket, request);
+    this.server!.handleUpgrade(request, socket, head, (webSocket) => {
+      this.server!.emit('connection', webSocket, request);
     });
   }
 }
