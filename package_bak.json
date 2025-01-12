@@ -5,18 +5,18 @@
   "scripts": {
     "prepare": "is-in-ci || husky",
     "build": "nx run-many -t build",
-    "dev": "yarn run build && nx watch --all -- yarn run build",
+    "dev": "pnpm run build && nx watch --all -- pnpm run build",
     "lint": "biome check --write",
     "lint:ci": "biome check",
     "typecheck": "nx run-many -t typecheck --exclude tests/metro-compat",
     "test": "nx run-many -t test",
-    "release": "yarn build && yarn lint && yarn test && yarn changeset publish",
+    "release": "pnpm build && pnpm lint && pnpm test && pnpm changeset publish",
     "pods": "nx run-many -t pods",
     "pods:update": "nx run-many -t pods:update",
-    "website:start": "yarn workspace website run start",
-    "website:build": "yarn workspace website run export"
+    "website:start": "pnpm --filter website run start",
+    "website:build": "pnpm --filter website run export"
   },
-  "workspaces": ["packages/*", "apps/*", "tests/*", "website"],
+  "workspaces": ["packages/*", "apps/*", "tests/*"],
   "devDependencies": {
     "@babel/cli": "^7.25.2",
     "@babel/core": "^7.25.2",

@@ -19,8 +19,7 @@ export default function checkReactNative(rootDir: string): SemVer {
     throw new Error('React-Native not found in package.json');
   }
   let rnV = packageJson.dependencies['react-native'];
-  if(rnV=="*")
-      rnV="0.99.9";
+  if (rnV === '*' || rnV === '1000.0.0') rnV = '0.99.9';
   const version = semver.coerce(rnV);
   if (!version) {
     throw new Error('Failed to parse React-Native version');
