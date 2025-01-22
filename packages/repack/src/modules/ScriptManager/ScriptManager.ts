@@ -370,14 +370,17 @@ export class ScriptManager extends EventEmitter {
 
       try {
         this.emit('loading', script.toObject());
+        console.log('000');
         await this.loadScriptWithRetry(scriptId, script.locator);
+        console.log('111');
         this.emit('loaded', script.toObject());
         await this.updateCache(script);
+        console.log('222');
       } catch (error) {
         const { code } = error as Error & { code: string };
         this.handleError(
           error,
-          '[ScriptManager] Failed to load script:',
+          '[ScriptManager] Failed to load script fuffffuffff:',
           code ? `[${code}]` : '',
           script.toObject()
         );
@@ -414,15 +417,24 @@ export class ScriptManager extends EventEmitter {
     while (attempts > 0) {
       try {
         await this.nativeScriptManager.loadScript(scriptId, locator);
+        console.log(
+          `from loadScriptWithRetry 1, attempts counter: ${attempts}`
+        );
         return; // Successfully loaded the script, exit the loop
       } catch (error) {
         attempts--;
+        console.log(
+          `from loadScriptWithRetry 2, attempts counter: ${attempts}`
+        );
         const { code } = error as Error & { code: string };
         if (attempts > 0 && LOADING_ERROR_CODES.includes(code)) {
           if (retryDelay > 0) {
             await new Promise((resolve) => setTimeout(resolve, retryDelay));
           }
         } else {
+          console.log(
+            `from loadScriptWithRetry 3, attempts counter: ${attempts}`
+          );
           throw error; // No more retries, throw the error
         }
       }

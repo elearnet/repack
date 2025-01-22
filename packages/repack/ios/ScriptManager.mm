@@ -306,7 +306,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
     NSData *data = [[NSData alloc] initWithContentsOfFile:[filesystemScriptUrl path]];
     [self evaluateJavascript:data url:config.sourceUrl resolve:resolve reject:reject];
   } @catch (NSError *error) {
-    reject(CodeExecutionFailure, error.localizedDescription, nil);
+      NSString *lastName = @"muhahahahahahahahfffuck...";
+      NSString *fullName = [NSString stringWithFormat:@"%@ %@", error.localizedDescription, lastName];
+    reject(CodeExecutionFailure, lastName, nil);
   }
 }
 

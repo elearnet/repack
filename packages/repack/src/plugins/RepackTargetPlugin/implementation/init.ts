@@ -13,6 +13,10 @@ module.exports = function () {
 
   __webpack_require__.repack = $globalObject$.__repack__ = repackRuntime;
 
+  //TypeError: Cannot read property 'push' of undefined
+  // temporary fix
+  if (!__webpack_require__.i) __webpack_require__.i = [];
+
   // intercept module factory calls to forward errors to global.ErrorUtils
   // aligned with `guardedLoadModule` behaviour in Metro
   // https://github.com/facebook/metro/blob/a4cb0b0e483748ef9f1c760cb60c57e3a84c1afd/packages/metro-runtime/src/polyfills/require.js#L329

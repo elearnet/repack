@@ -60,7 +60,7 @@ export const REACT_NATIVE_LAZY_IMPORTS = [
   'PanResponder',
   'PermissionsAndroid',
   'PixelRatio',
-  'PushNotificationIOS',
+  'PushNotificationIOS', //try to fix Invariant Violation: new NativeEventEmitter() requires a non-null argument
   'Settings',
   'Share',
   'StyleSheet',
