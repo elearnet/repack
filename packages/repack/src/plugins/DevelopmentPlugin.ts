@@ -73,7 +73,7 @@ export class DevelopmentPlugin implements RspackPluginInstance {
         fallback: {
           ...compiler.options.resolveLoader?.fallback,
           'builtin:react-refresh-loader': require.resolve(
-            '../loaders/reactRefreshCompatLoader'
+            '../loaders/reactRefreshLoader'
           ),
         },
       };

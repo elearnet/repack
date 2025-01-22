@@ -2,6 +2,7 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import * as Repack from '@callstack/repack';
+import { NativeWindPlugin } from '@callstack/repack-plugin-nativewind';
 import { ReanimatedPlugin } from '@callstack/repack-plugin-reanimated';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 
@@ -61,27 +62,28 @@ export default (env) => {
           type: 'javascript/auto',
           use: {
             loader: 'builtin:swc-loader',
-            /** @type {import('@rspack/core').SwcLoaderOptions} */
             options: {
               env: {
-                loose: true,
                 targets: {
                   'react-native': '0.74',
                 },
               },
               jsc: {
+                assumptions: {
+                  setPublicClassFields: true,
+                  privateFieldsAsProperties: true,
+                },
                 externalHelpers: true,
                 transform: {
                   react: {
                     runtime: 'automatic',
+                    importSource: 'nativewind',
                   },
                 },
               },
             },
           },
         },
-        // codegen needs to run before other loaders since it needs to access types
-        Repack.REACT_NATIVE_CODEGEN_RULES,
         {
           test: Repack.getAssetExtensionsRegExp(
             Repack.ASSET_EXTENSIONS.filter((ext) => ext !== 'svg')
@@ -157,7 +159,6 @@ export default (env) => {
         },
       ],
     },
-
     plugins: [
       /**
        * Configure other required and additional plugins to make the bundle
@@ -198,6 +199,7 @@ export default (env) => {
       // }),
       process.env.RSDOCTOR && new RsdoctorRspackPlugin(),
       new ReanimatedPlugin(),
+      new NativeWindPlugin(),
     ].filter(Boolean),
   };
 };
