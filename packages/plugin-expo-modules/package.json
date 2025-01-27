@@ -1,7 +1,7 @@
 {
-  "name": "@callstack/repack-plugin-reanimated",
+  "name": "@callstack/repack-plugin-expo-modules",
   "version": "5.0.0-rc.9",
-  "description": "A plugin for @callstack/repack that integrates react-native-reanimated",
+  "description": "A plugin for @callstack/repack that integrates Expo Modules",
   "author": "Jakub Romańczyk <jakub.romanczyk@callstack.com>",
   "license": "MIT",
   "homepage": "https://github.com/callstack/repack",
@@ -9,15 +9,11 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "loader"],
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./loader": {
-      "types": "./loader/index.d.ts",
-      "default": "./loader/index.js"
     }
   },
   "keywords": [
@@ -25,8 +21,8 @@
     "re.pack",
     "plugin",
     "repack-plugin",
-    "reanimated",
-    "react-native-reanimated"
+    "expo-modules",
+    "expo"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
@@ -37,13 +33,11 @@
     "node": ">=18"
   },
   "peerDependencies": {
-    "@babel/core": "^7.20",
     "@callstack/repack": "^5.0.0-rc.9"
   },
   "devDependencies": {
     "@callstack/repack": "workspace:*",
     "@rspack/core": "1.0.8",
-    "@types/babel__core": "7.20.5",
     "@types/node": "^18"
   },
   "scripts": {
