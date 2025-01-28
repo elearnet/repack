@@ -1,21 +1,16 @@
 {
   "name": "@callstack/repack-plugin-nativewind",
-  "version": "5.0.0-rc.9",
+  "version": "5.0.0-rc.10",
   "description": "A plugin for @callstack/repack that integrates NativeWind",
   "author": "Boris Yankov <boris.yankov@callstack.com>",
-  "contributors": [
-    "Jakub Romańczyk <jakub.romanczyk@callstack.com>"
-  ],
+  "contributors": ["Jakub Romańczyk <jakub.romanczyk@callstack.com>"],
   "license": "MIT",
   "homepage": "https://github.com/callstack/repack",
   "repository": "github:callstack/repack",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "loader"
-  ],
+  "files": ["dist", "loader"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -47,12 +42,12 @@
     "dedent": "^0.7.0"
   },
   "peerDependencies": {
-    "@callstack/repack": ">=5.0.0-rc.9",
-    "autoprefixer": ">=10.4.16",
+    "@callstack/repack": ">=5.0.0-rc.10",
     "nativewind": ">=4.1.23",
+    "react-native-css-interop": ">=0.1.22",
     "postcss": ">=8.4.31",
     "postcss-loader": ">=8.4.31",
-    "react-native-css-interop": ">=0.1.22",
+    "autoprefixer": ">=10.4.16",
     "tailwindcss": ">=3.4.11"
   },
   "devDependencies": {
