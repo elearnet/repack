@@ -16,7 +16,12 @@
     "website:start": "yarn workspace website run start",
     "website:build": "yarn workspace website run export"
   },
-  "workspaces": ["packages/*", "apps/*", "tests/*", "website"],
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tests/*",
+    "website"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.25.2",
     "@babel/core": "^7.25.2",

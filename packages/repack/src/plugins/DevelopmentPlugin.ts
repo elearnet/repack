@@ -43,7 +43,7 @@ export class DevelopmentPlugin implements RspackPluginInstance {
 
     const reactNativePackageJson: PackageJSON = require('react-native/package.json');
     let rnV = reactNativePackageJson.version;
-    if (rnV === '*' || rnV === '1000.0.0') rnV = '0.99.9';
+    if (rnV === '*' || rnV === '1000.0.0'|| rnV.includes('workspace')) rnV = '0.99.9';
     const [majorVersion, minorVersion, patchVersion] = rnV
       .split('-')[0]
       .split('.');

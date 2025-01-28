@@ -25,7 +25,7 @@ export default function checkReactNative(
     throw new RepackInitError('React Native not found in package.json');
   }
   let rnV = packageJson.dependencies['react-native'];
-  if (rnV === '*' || rnV === '1000.0.0') rnV = '0.99.9';
+  if (rnV === '*' || rnV === '1000.0.0'|| rnV.includes('workspace')) rnV = '0.99.9';
   const version = semver.coerce(rnV);
   if (!version) {
     throw new RepackInitError(
