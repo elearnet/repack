@@ -1,4 +1,3 @@
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import * as Repack from '@callstack/repack';
 import { NativeWindPlugin } from '@callstack/repack-plugin-nativewind';
@@ -6,7 +5,6 @@ import { ReanimatedPlugin } from '@callstack/repack-plugin-reanimated';
 import TerserPlugin from 'terser-webpack-plugin';
 
 const dirname = Repack.getDirname(import.meta.url);
-const { resolve } = createRequire(import.meta.url);
 
 export default (env) => {
   const {
@@ -14,12 +12,6 @@ export default (env) => {
     context = dirname,
     entry = './index.js',
     platform = process.env.PLATFORM,
-    minimize = mode === 'production',
-    devServer = undefined,
-    bundleFilename = undefined,
-    sourceMapFilename = undefined,
-    assetsPath = undefined,
-    reactNativePath = resolve('react-native'),
   } = env;
 
   if (!platform) {
@@ -28,7 +20,6 @@ export default (env) => {
 
   return {
     mode,
-    devtool: false,
     context,
     cache: process.env.USE_CACHE
       ? {
@@ -38,22 +29,12 @@ export default (env) => {
       : undefined,
     entry,
     resolve: {
-      ...Repack.getResolveOptions(platform),
-      alias: {
-        'react-native': reactNativePath,
-      },
+      ...Repack.getResolveOptions(),
     },
     output: {
-      clean: true,
-      hashFunction: 'xxhash64',
-      path: path.join(dirname, 'build/generated', platform),
-      filename: 'index.bundle',
-      chunkFilename: '[name].chunk.bundle',
-      publicPath: Repack.getPublicPath({ platform, devServer }),
       uniqueName: 'tester-app',
     },
     optimization: {
-      minimize,
       minimizer: [
         new TerserPlugin({
           test: /\.(js)?bundle(\?.*)?$/i,
@@ -65,7 +46,6 @@ export default (env) => {
           },
         }),
       ],
-      chunkIds: 'named',
     },
     module: {
       rules: [
@@ -83,13 +63,7 @@ export default (env) => {
             path.join(context, 'src/assetsTest/inlineAssets'),
             path.join(context, 'src/assetsTest/remoteAssets'),
           ],
-          use: {
-            loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-            },
-          },
+          use: '@callstack/repack/assets-loader',
         },
         {
           test: /\.svg$/,
@@ -108,13 +82,7 @@ export default (env) => {
             Repack.ASSET_EXTENSIONS.filter((ext) => ext !== 'svg')
           ),
           include: [path.join(context, 'src/assetsTest/localAssets')],
-          use: {
-            loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-            },
-          },
+          use: '@callstack/repack/assets-loader',
         },
         {
           test: Repack.getAssetExtensionsRegExp(
@@ -123,11 +91,7 @@ export default (env) => {
           include: [path.join(context, 'src/assetsTest/inlineAssets')],
           use: {
             loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-              inline: true,
-            },
+            options: { inline: true },
           },
         },
         {
@@ -138,8 +102,6 @@ export default (env) => {
           use: {
             loader: '@callstack/repack/assets-loader',
             options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
               remote: {
                 enabled: true,
                 publicPath: 'http://localhost:9999/remote-assets',
@@ -151,14 +113,7 @@ export default (env) => {
     },
     plugins: [
       new Repack.RepackPlugin({
-        context,
-        mode,
-        platform,
-        devServer,
         output: {
-          bundleFilename,
-          sourceMapFilename,
-          assetsPath,
           auxiliaryAssetsPath: path.join('build/output', platform, 'remote'),
         },
         extraChunks: [
@@ -176,7 +131,7 @@ export default (env) => {
       new ReanimatedPlugin(),
       new NativeWindPlugin(),
       // new Repack.plugins.ChunksToHermesBytecodePlugin({
-      //   enabled: mode === 'production' && !devServer,
+      //   enabled: mode === 'production',
       //   test: /\.(js)?bundle$/,
       //   exclude: /index.bundle$/,
       // }),
