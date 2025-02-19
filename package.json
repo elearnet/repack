@@ -36,6 +36,6 @@
     "husky": "^9.1.6",
     "is-in-ci": "^1.0.0",
     "nx": "19.7.3",
-    "typescript": "catalog:"
+    "typescript": "^5.7.2"
   }
 }

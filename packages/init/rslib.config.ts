@@ -12,7 +12,8 @@ export default defineConfig({
         },
       },
       output: {
-        minify: true,
+        minify: false,
+        sourceMap:true
       },
     },
   ],

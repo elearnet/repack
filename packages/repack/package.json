@@ -49,11 +49,11 @@
   "scripts": {
     "build:js": "babel src --out-dir dist --extensions \".js,.ts\" --source-maps --ignore \"**/__tests__/**\" --delete-dir-on-start",
     "build:ts": "tsc -p tsconfig.build.json --emitDeclarationOnly",
-    "build": "pnpm run \"/^build:.*/\"",
+    "build": "yarn run \"/^build:.*/\"",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "archive": "pnpm build && pnpm pack",
-    "clang-format": "pnpm clang-format:ios && pnpm clang-format:android",
+    "archive": "yarn build && yarn pack",
+    "clang-format": "yarn clang-format:ios && yarn clang-format:android",
     "clang-format:ios": "find ios/ -iname \"*.h\" -o -iname \"*.m\" -o -iname \"*.mm\" -o -iname \"*.cpp\" | xargs clang-format -i --Werror",
     "clang-format:android": "find android/src/ -iname \"*.h\" -o -iname \"*.cpp\" | xargs clang-format -i"
   },
@@ -109,8 +109,8 @@
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-tools": "15.0.1",
     "@react-native-community/cli-types": "15.0.1",
-    "@rspack/core": "catalog:",
-    "@swc/helpers": "catalog:",
+    "@rspack/core": "^1.2.2",
+    "@swc/helpers": "~0.5.15",
     "@types/dedent": "^0.7.0",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.0",
@@ -124,8 +124,8 @@
     "react": "19.0.0",
     "react-native": "workspace:*",
     "rspack-plugin-virtual-module": "^0.1.13",
-    "typescript": "catalog:",
-    "webpack": "catalog:"
+    "typescript": "^5.7.2",
+    "webpack": "^5.98.0"
   },
   "codegenConfig": {
     "name": "RNScriptManagerSpec",

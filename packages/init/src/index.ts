@@ -33,9 +33,15 @@ export default async function run(options: Options) {
   try {
     welcomeMessage();
 
-    const { projectRootDir } = await checkProjectExists(cwd);
+    let { projectRootDir } = await checkProjectExists(cwd);
     const packageManager = await checkPackageManager(projectRootDir);
-    checkReactNative(projectRootDir);
+    try {
+      checkReactNative(projectRootDir);
+    }
+    catch{
+      checkReactNative(cwd);
+      projectRootDir = cwd;
+    }
 
     const projectExists = projectRootDir !== undefined;
 

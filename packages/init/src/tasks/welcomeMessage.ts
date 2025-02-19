@@ -8,7 +8,7 @@ export default function welcomeMessage() {
       gradient([
         { color: '#9b6dff', pos: 0.45 },
         { color: '#3ce4cb', pos: 0.9 },
-      ])('RE.PACK INIT')
+      ])('RE.PACK INIT muhaha')
     )
   );
 }
