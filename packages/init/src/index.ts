@@ -53,7 +53,7 @@ export default async function run(options: Options) {
       );
     }
 
-    const rootDir = path.join(cwd, projectName!);
+    const rootDir = path.join(cwd, projectExists?'':projectName!);
 
     await modifyDependencies(bundler, rootDir, options.repackVersion);
 
