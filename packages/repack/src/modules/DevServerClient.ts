@@ -93,3 +93,5 @@ export function log(level: string, data: any[]) {
   client.log(level, data);
 }
 export function unstable_notifyFuseboxConsoleEnabled() {}
+//fix HMRClient.log(), Cannot read property 'log' of undefined
+export default client;
