@@ -1,5 +1,4 @@
 import path from 'node:path';
-// @ts-expect-error type only import
 import type { DevServerOptions } from '@callstack/repack-dev-server';
 import type {
   Compiler,
@@ -62,16 +61,16 @@ export class DevelopmentPlugin implements RspackPluginInstance {
       }
 
       // repack MF plugins expose config property
-      if ('config' in plugin) {
+      if ('config' in plugin && !!plugin.config.exposes) {
         return plugin.config.name;
       }
 
       // official MF plugins expose _options property
-      if ('_options' in plugin) {
+      if ('_options' in plugin && !!plugin.config.exposes) {
         return plugin._options.name;
       }
 
-      return null;
+      return;
     });
 
     return entrypoints.filter(Boolean);
@@ -120,14 +119,6 @@ export class DevelopmentPlugin implements RspackPluginInstance {
       __REACT_NATIVE_MINOR_VERSION__: Number(minorVersion),
       __REACT_NATIVE_PATCH_VERSION__: Number(patchVersion),
     }).apply(compiler);
-
-    // set public path for development with dev server
-    compiler.options.output.publicPath = `${protocol}://${host}:${port}/${platform}/`;
-
-    // enforce output filenames in development mode
-    compiler.options.output.filename = (pathData) =>
-      pathData.chunk?.name === 'main' ? 'index.bundle' : '[name].bundle';
-    compiler.options.output.chunkFilename = '[name].chunk.bundle';
 
     if (compiler.options.devServer.hot) {
       // setup HMR

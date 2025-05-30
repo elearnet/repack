@@ -1,22 +1,11 @@
 // @ts-check
-import path from 'node:path';
 import * as Repack from '@callstack/repack';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import rspack from '@rspack/core';
 
-const dirname = Repack.getDirname(import.meta.url);
-
 /** @type {(env: import('@callstack/repack').EnvOptions) => import('@rspack/core').Configuration} */
 export default (env) => {
-  const {
-    mode = 'development',
-    context = dirname,
-    platform = process.env.PLATFORM,
-  } = env;
-
-  if (!platform) {
-    throw new Error('Missing platform');
-  }
+  const { mode, context, platform } = env;
 
   /** @type {import('@rspack/core').Configuration} */
   const config = {
@@ -24,10 +13,10 @@ export default (env) => {
     context,
     entry: './src/mini/index.js',
     resolve: {
-      ...Repack.getResolveOptions(),
+      ...Repack.getResolveOptions({ enablePackageExports: true }),
     },
     output: {
-      path: path.join(dirname, 'build/mini-app/[platform]'),
+      path: '[context]/build/mini-app/[platform]',
       uniqueName: 'MFTester-MiniApp',
     },
     module: {
@@ -55,12 +44,12 @@ export default (env) => {
           react: {
             singleton: true,
             eager: false,
-            requiredVersion: '18.3.1',
+            requiredVersion: '19.0.0',
           },
           'react-native': {
             singleton: true,
             eager: false,
-            requiredVersion: '0.76.3',
+            requiredVersion: '0.79.1',
           },
           '@react-navigation/native': {
             singleton: true,
@@ -75,17 +64,17 @@ export default (env) => {
           'react-native-safe-area-context': {
             singleton: true,
             eager: false,
-            requiredVersion: '^4.14.0',
+            requiredVersion: '^5.4.0',
           },
           'react-native-screens': {
             singleton: true,
             eager: false,
-            requiredVersion: '^3.35.0',
+            requiredVersion: '^4.10.0',
           },
           '@react-native-async-storage/async-storage': {
             singleton: true,
             eager: false,
-            requiredVersion: '2.1.1',
+            requiredVersion: '^2.1.2',
           },
         },
       }),

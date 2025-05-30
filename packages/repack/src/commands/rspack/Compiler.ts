@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-// @ts-expect-error type-only import
 import type { Server } from '@callstack/repack-dev-server';
 import { rspack } from '@rspack/core';
 import type {
@@ -11,7 +10,7 @@ import type {
 import memfs from 'memfs';
 import type { Reporter } from '../../logging/types.js';
 import type { HMRMessage } from '../../types.js';
-import { CLIError } from '../common/error.js';
+import { CLIError } from '../common/cliError.js';
 import { adaptFilenameToPlatform, runAdbReverse } from '../common/index.js';
 import { DEV_SERVER_ASSET_TYPES } from '../consts.js';
 import type { CompilerAsset } from './types.js';

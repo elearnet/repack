@@ -11,6 +11,7 @@ import { getEnvOptions } from './getEnvOptions.js';
 import { getRepackConfig } from './getRepackConfig.js';
 import { loadProjectConfig } from './loadProjectConfig.js';
 import { normalizeConfig } from './normalizeConfig.js';
+import { validatePlugins } from './validatePlugins.js';
 
 interface MakeCompilerConfigOptions {
   args: StartArguments | BundleArguments;
@@ -39,7 +40,7 @@ export async function makeCompilerConfig<C extends ConfigurationObject>(
   // get cli overrides which take precedence over values from config files
   const cliConfigOverrides = getCliOverrides<C>({ args, command });
   // get defaults for use with specific commands
-  const commandConfig = getCommandConfig(command);
+  const commandConfig = getCommandConfig(command, bundler);
 
   // get defaults that will be applied on top of built-in ones (Rspack/webpack)
   const repackConfig = getRepackConfig();
@@ -68,6 +69,12 @@ export async function makeCompilerConfig<C extends ConfigurationObject>(
   const normalizedConfigs = configs.map((config, index) =>
     normalizeConfig(config, options.platforms[index])
   );
+
+  const plugins = normalizedConfigs.flatMap((config) =>
+    'plugins' in config ? config.plugins : []
+  );
+
+  await validatePlugins(rootDir, plugins, options.bundler);
 
   return normalizedConfigs as C[];
 }

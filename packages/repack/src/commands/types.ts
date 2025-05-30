@@ -10,6 +10,7 @@ export interface BundleArguments {
   assetsDest?: string;
   json?: string;
   stats?: string;
+  resetCache?: boolean;
   verbose?: boolean;
   watch?: boolean;
   config?: string;
@@ -27,28 +28,28 @@ export interface StartArguments {
   logFile?: string;
   logRequests?: boolean;
   platform?: string;
+  resetCache?: boolean;
   reversePort?: boolean;
   verbose?: boolean;
   config?: string;
   webpackConfig?: string;
 }
 
-interface CommonCliOptions {
-  config: {
-    root: string;
-    platforms: string[];
-    bundlerConfigPath: string;
-    reactNativePath: string;
-  };
+export interface CliConfig {
+  root: string;
+  platforms: string[];
+  reactNativePath: string;
 }
 
-export interface StartCliOptions extends CommonCliOptions {
+export interface StartCliOptions {
   command: 'start';
+  config: CliConfig;
   arguments: { start: StartArguments };
 }
 
-export interface BundleCliOptions extends CommonCliOptions {
+export interface BundleCliOptions {
   command: 'bundle';
+  config: CliConfig;
   arguments: { bundle: BundleArguments };
 }
 

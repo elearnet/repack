@@ -15,6 +15,9 @@ const mockCompiler = {
   context: __dirname,
   options: {},
   webpack: {
+    DefinePlugin: jest.fn(() => ({
+      apply: jest.fn(),
+    })),
     rspackVersion: '1.0.0',
   },
 } as unknown as Compiler;
@@ -26,6 +29,9 @@ const mockPlugin = MFPluginRspack as unknown as jest.Mock<
 const corePluginPath = require.resolve('@callstack/repack/mf/core-plugin');
 const resolverPluginPath = require.resolve(
   '@callstack/repack/mf/resolver-plugin'
+);
+const prefetchPluginPath = require.resolve(
+  '@callstack/repack/mf/prefetch-plugin'
 );
 
 describe('ModuleFederationPlugin', () => {
@@ -161,7 +167,8 @@ describe('ModuleFederationPlugin', () => {
     const config = mockPlugin.mock.calls[0][0];
     expect(config.runtimePlugins).toContain(corePluginPath);
     expect(config.runtimePlugins).toContain(resolverPluginPath);
-    expect(config.runtimePlugins).toHaveLength(2);
+    expect(config.runtimePlugins).toContain(prefetchPluginPath);
+    expect(config.runtimePlugins).toHaveLength(3);
   });
 
   it('should use loaded-first as default shareStrategy', () => {
