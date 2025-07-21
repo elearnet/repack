@@ -59,7 +59,7 @@ export async function applyProfile(
   const filter = resolveLayer(filterValue);
 
   await ensureFileDir(traceOutput);
-    await rspack.experiments.globalTrace.register(
+  await rspack.experiments.globalTrace.register(
     filter,
     // @ts-ignore
     traceLayer,

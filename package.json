@@ -35,10 +35,5 @@
     "typescript": "catalog:"
   },
   "packageManager": "yarn@4.9.0",
-  "workspaces": [
-    "packages/*",
-    "apps/*",
-    "tests/*",
-    "website"
-  ]
+  "workspaces": ["packages/*", "apps/*", "tests/*", "website"]
 }

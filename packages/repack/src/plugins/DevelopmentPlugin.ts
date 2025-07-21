@@ -104,7 +104,7 @@ export class DevelopmentPlugin implements RspackPluginInstance {
 
     const host = compiler.options.devServer.host;
     const port = compiler.options.devServer.port;
-      // @ts-ignore
+    // @ts-ignore
     const protocol = this.getProtocolType(compiler.options.devServer);
     const platform = this.config.platform ?? (compiler.options.name as string);
 

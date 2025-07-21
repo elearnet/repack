@@ -103,13 +103,13 @@ class HMRClient {
     if (!this.isUpdateAvailable()) {
       return;
     }
-// @ts-ignore
+    // @ts-ignore
     if (!module.hot) {
       // HMR is not enabled
       this.app.reload();
       return;
     }
-// @ts-ignore
+    // @ts-ignore
     if (module.hot.status() !== 'idle') {
       // HMR is disallowed in other states than 'idle'
       return;
@@ -136,7 +136,7 @@ class HMRClient {
     };
 
     console.debug('[HMRClient] Checking for updates on the server...');
-      // @ts-ignore
+    // @ts-ignore
     module.hot
       .check({
         onAccepted: this.app.dismissErrors,
@@ -146,9 +146,9 @@ class HMRClient {
         onDisposed: this.app.dismissErrors,
       })
       .then(
-          // @ts-ignore
+        // @ts-ignore
         (outdatedModules) => handleApplyUpdates(null, outdatedModules),
-          // @ts-ignore
+        // @ts-ignore
         (err) => handleApplyUpdates(err, null)
       );
   }
