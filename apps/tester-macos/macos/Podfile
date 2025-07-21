@@ -1,0 +1,41 @@
+
+# nm_path = "../node_modules"
+# react_native_macos_path = "#{nm_path}/react-native-macos/scripts/react_native_pods.rb"
+#
+# while Dir.exist?(nm_path) && !File.exist?(react_native_macos_path) do
+#  nm_path = "../#{nm_path}"
+#  react_native_macos_path = "#{nm_path}/react-native-macos/scripts/react_native_pods.rb"
+# end
+# require_relative react_native_macos_path
+
+require_relative '../node_modules/react-native-macos/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+prepare_react_native_project!
+
+
+target 'tester_macos-macOS' do
+  platform :macos, '11.0'
+  Pod::UI.warn("Hello 1.")
+  use_native_modules!
+  Pod::UI.warn("Hello 2.")
+  # Flags change depending on the env values.
+  flags = get_default_flags()
+
+  #ignore SwiftyRSA when building for macOS
+#   pod 'SwiftyRSA', '~> 1.7.0', :platforms => [:ios]
+#   pod 'SwiftyRSA', :git => 'https://github.com/TakeScoop/SwiftyRSA.git', :platforms => [:ios]
+
+
+  use_react_native!(
+    :path => '../node_modules/react-native-macos',
+    :hermes_enabled => false,
+    :fabric_enabled => ENV['RCT_NEW_ARCH_ENABLED'] == '1',
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  post_install do |installer|
+    react_native_post_install(installer)
+  end
+end

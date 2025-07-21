@@ -103,13 +103,13 @@ class HMRClient {
     if (!this.isUpdateAvailable()) {
       return;
     }
-
+// @ts-ignore
     if (!module.hot) {
       // HMR is not enabled
       this.app.reload();
       return;
     }
-
+// @ts-ignore
     if (module.hot.status() !== 'idle') {
       // HMR is disallowed in other states than 'idle'
       return;
@@ -136,6 +136,7 @@ class HMRClient {
     };
 
     console.debug('[HMRClient] Checking for updates on the server...');
+      // @ts-ignore
     module.hot
       .check({
         onAccepted: this.app.dismissErrors,
@@ -145,12 +146,14 @@ class HMRClient {
         onDisposed: this.app.dismissErrors,
       })
       .then(
+          // @ts-ignore
         (outdatedModules) => handleApplyUpdates(null, outdatedModules),
+          // @ts-ignore
         (err) => handleApplyUpdates(err, null)
       );
   }
 }
-
+// @ts-ignore
 if (__DEV__ && module.hot) {
   const reload = () => {
     const DevSettings: RNDevSettings = require('react-native').DevSettings;

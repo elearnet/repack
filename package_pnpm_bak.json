@@ -1,0 +1,40 @@
+{
+  "name": "repack",
+  "private": true,
+  "scripts": {
+    "prepare": "is-in-ci || husky",
+    "build": "nx run-many -t build",
+    "dev": "pnpm run build && nx watch --all -- pnpm run build",
+    "lint": "biome check --write",
+    "lint:ci": "biome check",
+    "typecheck": "nx run-many -t typecheck --exclude tests/metro-compat",
+    "test": "nx run-many -t test",
+    "release": "pnpm build && pnpm lint && pnpm test && pnpm changeset publish",
+    "pods": "nx run-many -t pods",
+    "pods:update": "nx run-many -t pods:update",
+    "website:start": "pnpm --filter website run start",
+    "website:build": "pnpm --filter website run export"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.25.2",
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-syntax-flow": "^7.23.3",
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@babel/runtime": "^7.25.0",
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.29.4",
+    "husky": "^9.1.6",
+    "is-in-ci": "^1.0.0",
+    "nx": "19.7.3",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@9.5.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "@rspress/plugin-llms@2.0.0-beta.3": "patches/@rspress__plugin-llms@2.0.0-beta.3.patch"
+    }
+  }
+}

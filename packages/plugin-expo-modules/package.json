@@ -9,7 +9,9 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -38,7 +40,8 @@
   "devDependencies": {
     "@callstack/repack": "workspace:*",
     "@rspack/core": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

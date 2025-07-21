@@ -9,7 +9,10 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "loader"],
+  "files": [
+    "dist",
+    "loader"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -36,7 +39,6 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@babel/core": "^7.20",
     "@callstack/repack": "workspace:*"
@@ -45,7 +47,8 @@
     "@callstack/repack": "workspace:*",
     "@rspack/core": "catalog:",
     "@types/babel__core": "7.20.5",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
