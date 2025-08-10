@@ -1,6 +1,6 @@
 {
   "name": "repack",
-  "packageManager": "yarn@3.6.4",
+  "packageManager": "yarn@4.9.2",
   "private": true,
   "scripts": {
     "prepare": "is-in-ci || husky",
@@ -38,9 +38,7 @@
     "nx": "19.7.3",
     "typescript": "^5.8.3"
   },
-  "pnpm": {
-    "patchedDependencies": {
-      "@rspress/plugin-llms@2.0.0-beta.3": "patches/@rspress__plugin-llms@2.0.0-beta.3.patch"
-    }
+  "dependencies": {
+    "@rspress/plugin-llms": "patch:@rspress/plugin-llms@npm%3A2.0.0-beta.3#patches/@rspress-plugin-llms-npm-2.0.0-beta.3-45ea6ad181.patch"
   }
 }
