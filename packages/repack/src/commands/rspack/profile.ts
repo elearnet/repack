@@ -61,6 +61,7 @@ export async function applyProfile(
   await ensureFileDir(traceOutput);
   await rspack.experiments.globalTrace.register(
     filter,
+    // @ts-ignore
     traceLayer,
     traceOutput
   );

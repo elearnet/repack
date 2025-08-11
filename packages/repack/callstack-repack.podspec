@@ -4,6 +4,8 @@ package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 new_arch_enabled = ENV['RCT_NEW_ARCH_ENABLED'] == '1'
 
+# Pod::UI.warn("Hello from callstack-repack.podspec")
+
 Pod::Spec.new do |s|
   s.name                 = "callstack-repack"
   s.version              = package["version"]
@@ -11,15 +13,16 @@ Pod::Spec.new do |s|
   s.homepage             = package["homepage"]
   s.license              = package["license"]
   s.authors              = package["author"]
-  s.platforms            = { :ios => "12.0" }
+  s.platforms            = { :ios => "12.0",:macos => "11.0" }
   s.source               = { :git => "https://github.com/callstack/repack.git", :tag => "#{s.version}" }
-  s.source_files         = "ios/**/*.{h,m,mm,swift}"
+  s.ios.source_files         = "ios/**/*.{h,m,mm,swift}"
+  s.macos.source_files         = "macos/**/*.{h,m,mm,swift}"
   s.static_framework     = true
 
   s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
 
   s.dependency 'JWTDecode', '~> 3.0.0'
-  s.dependency 'SwiftyRSA', '~> 1.7'
+  s.ios.dependency 'SwiftyRSA', '~> 1.7'
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.

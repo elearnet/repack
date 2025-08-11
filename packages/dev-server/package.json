@@ -34,7 +34,7 @@
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",
-    "archive": "pnpm build && pnpm pack"
+    "archive": "yarn build && yarn pack"
   },
   "dependencies": {
     "@babel/code-frame": "^7.26.2",

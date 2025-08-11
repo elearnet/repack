@@ -36,7 +36,7 @@
     "husky": "^9.1.6",
     "is-in-ci": "^1.0.0",
     "nx": "19.7.3",
-    "typescript": "^5.8.3"
+    "typescript": "catalog:repack"
   },
   "dependencies": {
     "@rspress/plugin-llms": "patch:@rspress/plugin-llms@npm%3A2.0.0-beta.3#patches/@rspress-plugin-llms-npm-2.0.0-beta.3-45ea6ad181.patch"

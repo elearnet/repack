@@ -1,0 +1,39 @@
+{
+  "name": "repack",
+  "private": true,
+  "scripts": {
+    "prepare": "is-in-ci || husky",
+    "build": "nx run-many -t build",
+    "dev": "yarn run build && nx watch --all -- yarn run build",
+    "lint": "biome check --write",
+    "lint:ci": "biome check",
+    "typecheck": "nx run-many -t typecheck --exclude tests/metro-compat",
+    "test": "nx run-many -t test",
+    "release": "yarn build && yarn lint && yarn test && yarn changeset publish",
+    "pods": "nx run-many -t pods",
+    "pods:update": "nx run-many -t pods:update",
+    "website:start": "yarn --filter website run start",
+    "website:build": "yarn --filter website run export"
+  },
+  "dependencies": {
+    "@rspress/plugin-llms": "patch:@rspress/plugin-llms@npm%3A2.0.0-beta.3#patches/@rspress-plugin-llms-npm-2.0.0-beta.3-45ea6ad181.patch"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.25.2",
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-syntax-flow": "^7.23.3",
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@babel/runtime": "^7.25.0",
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.29.4",
+    "husky": "^9.1.6",
+    "is-in-ci": "^1.0.0",
+    "nx": "19.7.3",
+    "typescript": "catalog:"
+  },
+  "packageManager": "yarn@4.9.2",
+  "workspaces": ["packages/*", "apps/*", "tests/*", "website"]
+}
