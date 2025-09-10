@@ -34,7 +34,7 @@
     "@swc/helpers": "catalog:repack",
     "@types/jest": "^29.5.13",
     "@types/react": "^19.0.0",
-    "react-native-test-app": "4.3.3",
+    "react-native-test-app": "catalog:repack",
     "terser-webpack-plugin": "catalog:repack",
     "typescript": "catalog:repack",
     "webpack": "catalog:repack"
