@@ -34,9 +34,9 @@
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react-test-renderer": "19.0.0",
-    "terser-webpack-plugin": "catalog:",
-    "typescript": "catalog:",
-    "webpack": "catalog:"
+    "terser-webpack-plugin": "catalog:repack",
+    "typescript": "catalog:repack",
+    "webpack": "catalog:repack"
   },
   "engines": {
     "node": ">=18"
