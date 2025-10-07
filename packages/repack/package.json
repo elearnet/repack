@@ -124,9 +124,9 @@
     "babel-jest": "^29.7.0",
     "clang-format": "^1.8.0",
     "jest": "^29.7.0",
-    "react": "catalog:libs",
-    "react-native": "catalog:libs",
-    "react-native-windows": "catalog:libs",
+    "react": "catalog:repack",
+    "react-native": "catalog:repack",
+    "react-native-windows": "catalog:repack",
     "rspack-plugin-virtual-module": "^0.1.13",
     "typescript": "catalog:repack",
     "webpack": "catalog:repack"
