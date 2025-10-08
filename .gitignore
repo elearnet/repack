@@ -359,7 +359,15 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/node,reactnative
 
 # Yarn
-.yarn/*
+.yarn_bak/*
+!.yarn_bak/patches
+!.yarn_bak/plugins
+!.yarn_bak/releases
+!.yarn_bak/sdks
+!.yarn_bak/versions
+yarn.lock
+.yarn
+.yarnrc.yml
 
 
 # Local Netlify folder

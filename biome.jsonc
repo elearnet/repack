@@ -6,7 +6,7 @@
     "defaultBranch": "main",
     "useIgnoreFile": true
   },
-  "files": { "ignoreUnknown": false, "ignore": [] },
+  "files": { "ignoreUnknown": false, "ignore": [".yarn_bak/*"] },
   "formatter": {
     "enabled": true,
     "useEditorconfig": true,
@@ -40,6 +40,9 @@
       "correctness": {
         "noUnusedImports": "error",
         "noUnusedVariables": "error"
+      },
+      "performance": {
+        "noDelete": "off"
       },
       "style": {
         "noNonNullAssertion": "off",

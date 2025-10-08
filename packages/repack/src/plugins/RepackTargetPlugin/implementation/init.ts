@@ -10,5 +10,4 @@ module.exports = function () {
   };
 
   __webpack_require__.repack = $globalObject$.__repack__ = repackRuntime;
-  const test = 'muhahaha';
 };

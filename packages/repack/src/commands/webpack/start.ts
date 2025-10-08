@@ -1,6 +1,8 @@
 import type { Server } from '@callstack/repack-dev-server';
 import type { Configuration, StatsCompilation } from 'webpack';
 import packageJson from '../../../package.json';
+import { VERBOSE_ENV_KEY } from '../../env.js';
+import { CLIError, isTruthyEnv } from '../../helpers/index.js';
 import {
   ConsoleReporter,
   FileReporter,
@@ -9,12 +11,13 @@ import {
   makeLogEntryFromFastifyLog,
 } from '../../logging/index.js';
 import type { HMRMessage } from '../../types.js';
-import { CLIError } from '../common/cliError.js';
 import { makeCompilerConfig } from '../common/config/makeCompilerConfig.js';
 import {
+  getDevMiddleware,
   getMimeType,
-  parseFileUrl,
+  parseUrl,
   resetPersistentCache,
+  resolveProjectPath,
   runAdbReverse,
   setupInteractions,
 } from '../common/index.js';
@@ -43,25 +46,30 @@ export async function start(
     throw new CLIError(`Unrecognized platform: ${args.platform}`);
   }
 
+  const platforms = args.platform ? [args.platform] : detectedPlatforms;
+
   const configs = await makeCompilerConfig<Configuration>({
     args: args,
     bundler: 'webpack',
-    // bundler: 'rspack',
     command: 'start',
     rootDir: cliConfig.root,
-    platforms: args.platform ? [args.platform] : detectedPlatforms,
+    platforms: platforms,
     reactNativePath: cliConfig.reactNativePath,
   });
 
   // expose selected args as environment variables
   setupEnvironment(args);
 
+  const isVerbose = isTruthyEnv(process.env[VERBOSE_ENV_KEY]);
   const devServerOptions = configs[0].devServer ?? {};
-  const showHttpRequests = args.verbose || args.logRequests;
+  const showHttpRequests = isVerbose || args.logRequests;
+
+  // dynamically import dev middleware to match version of react-native
+  const devMiddleware = await getDevMiddleware(cliConfig.reactNativePath);
 
   const reporter = composeReporters(
     [
-      new ConsoleReporter({ asJson: args.json, isVerbose: args.verbose }),
+      new ConsoleReporter({ asJson: args.json, isVerbose: isVerbose }),
       args.logFile ? new FileReporter({ filename: args.logFile }) : undefined,
     ].filter(Boolean) as Reporter[]
   );
@@ -89,6 +97,7 @@ export async function start(
       ...devServerOptions,
       rootDir: cliConfig.root,
       logRequests: showHttpRequests,
+      devMiddleware,
     },
     delegate: (ctx): Server.Delegate => {
       if (args.interactive) {
@@ -172,28 +181,32 @@ export async function start(
 
       return {
         compiler: {
-          getAsset: (filename, platform, sendProgress) => {
-            const parsedUrl = parseFileUrl(filename, 'file:///');
-            return compiler.getSource(
-              parsedUrl.filename,
-              platform,
-              sendProgress
-            );
+          getAsset: (url, platform, sendProgress) => {
+            const { resourcePath } = parseUrl(url, platforms);
+            return compiler.getSource(resourcePath, platform, sendProgress);
           },
-          getMimeType: (filename) => getMimeType(filename),
-          inferPlatform: (uri) => {
-            const { platform } = parseFileUrl(uri, 'file:///');
+          getMimeType: (filename) => {
+            return getMimeType(filename);
+          },
+          inferPlatform: (url) => {
+            const { platform } = parseUrl(url, platforms);
             return platform;
           },
         },
-        symbolicator: {
-          getSource: (fileUrl) => {
-            const { filename, platform } = parseFileUrl(fileUrl);
-            return compiler.getSource(filename, platform);
+        devTools: {
+          resolveProjectPath: (filepath) => {
+            return resolveProjectPath(filepath, cliConfig.root);
           },
-          getSourceMap: (fileUrl) => {
-            const { filename, platform } = parseFileUrl(fileUrl);
-            return compiler.getSourceMap(filename, platform);
+        },
+        symbolicator: {
+          getSource: (url) => {
+            let { resourcePath, platform } = parseUrl(url, platforms);
+            resourcePath = resolveProjectPath(resourcePath, cliConfig.root);
+            return compiler.getSource(resourcePath, platform);
+          },
+          getSourceMap: (url) => {
+            const { resourcePath, platform } = parseUrl(url, platforms);
+            return compiler.getSourceMap(resourcePath, platform);
           },
           shouldIncludeFrame: (frame) => {
             // If the frame points to internal bootstrap/module system logic, skip the code frame.

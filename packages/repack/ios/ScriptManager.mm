@@ -114,7 +114,10 @@ RCT_EXPORT_METHOD(prefetchScript
                  resolve(nil);
                }
              }];
-      } else {
+      } else if ([[config.url scheme] isEqualToString:@"file"]) {
+        [self executeFromFilesystem:config resolve:resolve reject:reject];
+      }
+      else {
         reject(
             UnsupportedScheme,
             [NSString stringWithFormat:@"Scheme in URL '%@' is not supported", config.url.absoluteString],
@@ -304,11 +307,24 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(unstable_evaluateScript
       filesystemScriptUrl = [[NSBundle mainBundle] URLForResource:scriptName withExtension:scriptExtension];
     }
     NSData *data = [[NSData alloc] initWithContentsOfFile:[filesystemScriptUrl path]];
-    [self evaluateJavascript:data url:config.sourceUrl resolve:resolve reject:reject];
+
+    NSDictionary<NSString *, id> *result = [CodeSigningUtils extractBundleAndTokenWithFileContent:data];
+    NSData *bundle = (result[@"bundle"] != [NSNull null]) ? result[@"bundle"] : nil;
+    NSString *token = (result[@"token"] != [NSNull null]) ? result[@"token"] : nil;
+
+    if ([config.verifyScriptSignature isEqualToString:@"strict"] ||
+        ([config.verifyScriptSignature isEqualToString:@"lax"] && token != nil)) {
+      NSError *codeSigningError = nil;
+      [CodeSigningUtils verifyBundleWithToken:token fileContent:bundle error:&codeSigningError];
+      if (codeSigningError != nil) {
+        reject(CodeExecutionFailure, codeSigningError.localizedDescription, nil);
+        return;
+      }
+    }
+
+    [self evaluateJavascript:bundle url:config.sourceUrl resolve:resolve reject:reject];
   } @catch (NSError *error) {
-      NSString *lastName = @"muhahahahahahahahfffuck...";
-      NSString *fullName = [NSString stringWithFormat:@"%@ %@", error.localizedDescription, lastName];
-    reject(CodeExecutionFailure, lastName, nil);
+    reject(CodeExecutionFailure, error.localizedDescription, nil);
   }
 }
 

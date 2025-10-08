@@ -11,6 +11,6 @@ export default function flowLoader(this: LoaderContext, source: string) {
 
   const result = flowRemoveTypes(source, options);
   const sourceMap = options.pretty ? result.generateMap() : undefined;
-
+  //@ts-ignore
   callback(null, result.toString(), sourceMap);
 }

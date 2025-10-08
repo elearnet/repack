@@ -97,7 +97,6 @@ export function unstable_notifyFuseboxConsoleEnabled() {}
 
 // React Native >= 0.79
 export default {
-  client,//fix HMRClient.log(), Cannot read property 'log' of undefined
   setup,
   enable,
   disable,

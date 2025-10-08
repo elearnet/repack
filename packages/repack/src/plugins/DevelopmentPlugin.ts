@@ -1,14 +1,13 @@
 import path from 'node:path';
 import type { DevServerOptions } from '@callstack/repack-dev-server';
 import type {
-  Compiler,
   EntryNormalized,
   Plugins,
-  RspackPluginInstance,
+  Compiler as RspackCompiler,
 } from '@rspack/core';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
-import { isRspackCompiler } from './utils/isRspackCompiler.js';
-import { moveElementBefore } from './utils/moveElementBefore.js';
+import type { Compiler as WebpackCompiler } from 'webpack';
+import { isRspackCompiler, moveElementBefore } from '../helpers/index.js';
 
 const [reactRefreshEntryPath, reactRefreshPath, refreshUtilsPath] =
   ReactRefreshPlugin.deprecated_runtimePaths;
@@ -30,7 +29,7 @@ export interface DevelopmentPluginConfig {
  *
  * @category Webpack Plugin
  */
-export class DevelopmentPlugin implements RspackPluginInstance {
+export class DevelopmentPlugin {
   /**
    * Constructs new `DevelopmentPlugin`.
    *
@@ -88,26 +87,23 @@ export class DevelopmentPlugin implements RspackPluginInstance {
     return 'http';
   }
 
-  /**
-   * Apply the plugin.
-   *
-   * @param compiler Webpack compiler instance.
-   */
-  apply(compiler: Compiler) {
+  apply(compiler: RspackCompiler): void;
+  apply(compiler: WebpackCompiler): void;
+
+  apply(__compiler: unknown) {
+    const compiler = __compiler as RspackCompiler;
+
     if (!compiler.options.devServer) {
       return;
     }
 
     const reactNativePackageJson: PackageJSON = require('react-native/package.json');
-    let rnV = reactNativePackageJson.version;
-    if (rnV === '*' || rnV === '1000.0.0'|| rnV.includes('workspace')) rnV = '0.99.9';
-    const [majorVersion, minorVersion, patchVersion] = rnV
-      .split('-')[0]
-      .split('.');
+    const [majorVersion, minorVersion, patchVersion] =
+      reactNativePackageJson.version.split('-')[0].split('.');
 
     const host = compiler.options.devServer.host;
     const port = compiler.options.devServer.port;
-    // @ts-ignore
+    // @ts-expect-error: devServertypes here are not being overridden properly
     const protocol = this.getProtocolType(compiler.options.devServer);
     const platform = this.config.platform ?? (compiler.options.name as string);
 

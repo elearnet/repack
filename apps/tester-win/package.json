@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "react": "19.0.0",
-    "react-native": "catalog:repack-windows",
-    "react-native-windows": "catalog:repack-windows"
+    "react-native": "catalog:",
+    "react-native-windows": "catalog:"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -37,8 +37,8 @@
     "prettier": "2.8.8",
     "react-native-monorepo-tools": "^1.2.1",
     "react-test-renderer": "19.0.0",
-    "typescript": "5.0.4",
-    "webpack": "catalog:repack-windows"
+    "typescript": "catalog:dev",
+    "webpack": "catalog:dev"
   },
   "engines": {
     "node": ">=18"
